@@ -51,6 +51,15 @@ the binary and the program uses it. The path of the file in use is shown in
 `SuperPinger -> Settings`. The `-config` flag has the priority over both of
 them.
 
+The logs stay where the configuration file says, a fully portable
+installation needs a `dataDir` next to the configuration file:
+
+```json
+{
+  "dataDir": "./data"
+}
+```
+
 ## Usage
 
 Start the application and add the addresses you want to watch with the `Add`
