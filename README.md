@@ -35,14 +35,14 @@ graph of the selected target on the right.
 PingPing is portable: download the archive of your platform, unpack it and
 run the binary. There is no installer and no system wide configuration.
 
-The program stores its configuration and its logs in the user configuration
-directory of the operating system:
+The program stores its configuration in the user configuration directory and
+its logs in the user data directory of the operating system:
 
 | Platform | Configuration | Logs |
 | -------- | ------------- | ---- |
-| Linux | `~/.config/pingping/config.json` | `~/.config/pingping/data/logs` |
-| macOS | `~/Library/Application Support/pingping/config.json` | `~/Library/Application Support/pingping/data/logs` |
-| Windows | `%AppData%\pingping\config.json` | `%AppData%\pingping\data\logs` |
+| Linux | `$XDG_CONFIG_HOME/pingping/config.json` (`~/.config/...`) | `$XDG_DATA_HOME/pingping/logs` (`~/.local/share/...`) |
+| macOS | `~/Library/Application Support/pingping/config.json` | `~/Library/Application Support/pingping/logs` |
+| Windows | `%AppData%\pingping\config.json` | `%LocalAppData%\pingping\logs` |
 
 A `config.json` in the folder the program is started from replaces the one of
 the user configuration directory, the two setups are then independent. It
@@ -243,7 +243,7 @@ change, so it can be edited by hand as well:
   "graphWindow": "1h",
   "logRetentionDays": 30,
   "icmpMode": "auto",
-  "dataDir": "/home/user/.config/pingping/data"
+  "dataDir": "/home/user/.local/share/pingping"
 }
 ```
 

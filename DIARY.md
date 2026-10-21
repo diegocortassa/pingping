@@ -363,3 +363,19 @@
 - The menu is rebuilt on every rebuild so the check mark follows the value
   changed in the settings as well.
 - Both paths write the configuration, so the choice survives a restart.
+
+## 2026-10-21 - XDG data directory
+
+### Observations
+
+- The logs were stored below the configuration directory, but the XDG base
+  directory specification puts the user data in `$XDG_DATA_HOME`, which
+  defaults to `~/.local/share`, and the configuration in `$XDG_CONFIG_HOME`.
+
+### Decisions
+
+- `DefaultDataDir` is now platform specific: `$XDG_DATA_HOME/pingping` on the
+  Unix systems, Application Support on macOS, `%LocalAppData%\pingping` on
+  Windows because the logs must not roam with the profile.
+- A relative `$XDG_DATA_HOME` is ignored, as the specification requires.
+- There is no migration, the project is still experimental.

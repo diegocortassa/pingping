@@ -150,13 +150,11 @@ func ResolvePath(explicit string) string {
 	return DefaultPath()
 }
 
-// DefaultDataDir returns the default directory for the persistent data.
+// DefaultDataDir returns the default directory for the persistent data. It
+// follows the conventions of the operating system, see the defaultDataDir
+// implementations.
 func DefaultDataDir() string {
-	dir, err := os.UserConfigDir()
-	if err != nil {
-		return "pingping-data"
-	}
-	return filepath.Join(dir, "pingping", "data")
+	return defaultDataDir()
 }
 
 // Load reads the configuration from path. A missing file yields the default

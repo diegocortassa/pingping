@@ -29,6 +29,7 @@
       directory, the Fyne application identifier and the documentation.
 - [x] One CSV log file per target, rotated every 24 hours.
 - [x] `Graph` menu to change the graph window without opening the settings.
+- [x] Store the logs in `$XDG_DATA_HOME` instead of the configuration directory.
 
 ## Doing
 
