@@ -65,8 +65,9 @@ func (h *History) Window() time.Duration {
 	return h.window
 }
 
-// SetWindow changes the rolling window and drops the samples that fell out of
-// it.
+// SetWindow changes the rolling window. Samples are not dropped when the window
+// becomes smaller, they remain in memory so expanding the window again shows
+// the previous data.
 func (h *History) SetWindow(window time.Duration) {
 	if window <= 0 {
 		return
@@ -74,7 +75,6 @@ func (h *History) SetWindow(window time.Duration) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.window = window
-	h.pruneLocked(time.Now())
 }
 
 // Add stores a sample and drops the ones that left the window.
@@ -90,7 +90,6 @@ func (h *History) Add(s model.Sample) {
 		samples = samples[len(samples)-maxSamplesPerTarget:]
 	}
 	h.series[s.TargetID] = samples
-	h.pruneLocked(s.Time)
 }
 
 // Samples returns a copy of the samples of a target inside the window.
@@ -99,8 +98,30 @@ func (h *History) Samples(targetID string) []model.Sample {
 	defer h.mu.RUnlock()
 
 	stored := h.series[targetID]
-	out := make([]model.Sample, len(stored))
-	copy(out, stored)
+	out := make([]model.Sample, 0, len(stored))
+	cutoff := time.Now().Add(-h.window)
+	for _, s := range stored {
+		if !s.Time.Before(cutoff) {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+// SamplesInsideWindow returns the samples inside the given window ending at
+// now. It is used by tests and by callers that need a fixed time base.
+func (h *History) SamplesInsideWindow(targetID string, now time.Time) []model.Sample {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	stored := h.series[targetID]
+	out := make([]model.Sample, 0, len(stored))
+	cutoff := now.Add(-h.window)
+	for _, s := range stored {
+		if !s.Time.Before(cutoff) {
+			out = append(out, s)
+		}
+	}
 	return out
 }
 
@@ -108,7 +129,14 @@ func (h *History) Samples(targetID string) []model.Sample {
 func (h *History) Stats(targetID string) Stats {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
-	return statsOf(h.series[targetID])
+	cutoff := time.Now().Add(-h.window)
+	out := make([]model.Sample, 0, len(h.series[targetID]))
+	for _, s := range h.series[targetID] {
+		if !s.Time.Before(cutoff) {
+			out = append(out, s)
+		}
+	}
+	return statsOf(out)
 }
 
 // Targets returns the identifiers that have samples.
@@ -131,23 +159,11 @@ func (h *History) Forget(targetID string) {
 	delete(h.series, targetID)
 }
 
-// pruneLocked removes the samples that are older than the window.
+// pruneLocked removes the samples that are older than the window. It is kept
+// for compatibility and does nothing because the pruning is done when
+// samples and statistics are read.
 func (h *History) pruneLocked(now time.Time) {
-	cutoff := now.Add(-h.window)
-	for id, samples := range h.series {
-		idx := 0
-		for idx < len(samples) && samples[idx].Time.Before(cutoff) {
-			idx++
-		}
-		if idx == 0 {
-			continue
-		}
-		if idx == len(samples) {
-			delete(h.series, id)
-			continue
-		}
-		h.series[id] = samples[idx:]
-	}
+	_ = now
 }
 
 // statsOf computes the statistics of a list of samples.

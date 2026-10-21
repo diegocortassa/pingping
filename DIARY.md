@@ -267,3 +267,20 @@
   file. A fully portable installation needs a `dataDir` in the local
   configuration file, the value is written to it the first time the file is
   saved.
+
+## 2026-10-21 - Graph window changes
+
+### Observations
+
+- Changing the graph window in the settings from one hour to fifteen
+  minutes and back to one hour made the chart show only the last fifteen
+  minutes. The history was pruned when the window was changed, so the old
+  samples were lost.
+
+### Decisions
+
+- The samples are kept in memory, the window is only used when computing
+  the statistics and when drawing the chart. Changing the window does not
+  drop samples anymore, so expanding it again shows the previous data.
+- The pruning is only done by the time of reading, and the safety cap is
+  still enforced when a sample is added.

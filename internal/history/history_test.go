@@ -49,6 +49,15 @@ func TestSetWindowPrunes(t *testing.T) {
 	if got := len(h.Samples("t1")); got != 1 {
 		t.Fatalf("got %d samples, want 1", got)
 	}
+	if got := len(h.SamplesInsideWindow("t1", now)); got != 1 {
+		t.Fatalf("got %d samples inside window, want 1", got)
+	}
+	h.mu.RLock()
+	stored := len(h.series["t1"])
+	h.mu.RUnlock()
+	if stored != 2 {
+		t.Fatalf("got %d samples in memory, want 2", stored)
+	}
 }
 
 func TestStats(t *testing.T) {
