@@ -30,7 +30,7 @@
 ### Decisions
 
 - Config and data live in the OS user config directory
-  (`~/.config/superping` on Linux) instead of next to the binary: the binary
+  (`~/.config/pingping` on Linux) instead of next to the binary: the binary
   may live on a read only medium. The path can be overridden with
   `--config` and `--data-dir`.
 - Durations are stored in JSON as human readable strings (`"5s"`) through a
@@ -115,7 +115,7 @@
 - The samples carry an `offline` flag, it tells the interface that the probe
   was never sent, so the status column reads `error` instead of `down` and the
   reason is shown below the graph.
-- `superping -diagnose` opens both ICMP sockets and prints what the system
+- `pingping -diagnose` opens both ICMP sockets and prints what the system
   allows, the group range and the capabilities of the process, with the
   command that fixes it. It answers the question the error alone does not:
   why does the `ping` command work without any change.
@@ -155,7 +155,7 @@
 
 - The metadata of the application lives in `internal/appinfo`: the name, the
   author, a short description and the version. The build sets the version with
-  `-X github.com/superping/superping/internal/appinfo.Version`, the `main`
+  `-X github.com/pingping/pingping/internal/appinfo.Version`, the `main`
   package and the interface read the same value, so the about dialog and the
   `-version` flag can never disagree.
 - The about dialog is built by `aboutContent`, a separate function, so the
@@ -174,7 +174,7 @@
 ### Decisions
 
 - The toolbar holds only the target actions: add, edit and remove. The
-  settings stay in the `SuperPinger` menu.
+  settings stay in the `PingPing` menu.
 - The application keeps a reference to the toolbar, a test pins the buttons of
   the toolbar and checks that the settings are still in the menu.
 
@@ -205,7 +205,7 @@
 ### Observations
 
 - On Windows the button "Open log folder" failed with
-  `parse "file://C:\Users\dcortassa\AppData\Roaming\superping\data\logs": invalid port ":\Users\..." after host`.
+  `parse "file://C:\Users\dcortassa\AppData\Roaming\pingping\data\logs": invalid port ":\Users\..." after host`.
 - The URL was built by concatenating the scheme and the path. A Windows path
   is not a URL path: the backslashes are invalid and the drive letter is
   read as the host, so the rest of the path is parsed as the port.
@@ -214,7 +214,7 @@
 
 - The file URL is built with `url.URL`, the path is made absolute, the
   separators are slashes and a Windows drive gets the leading slash of a URL
-  path: `file:///C:/Users/dcortassa/AppData/Roaming/superping/data/logs`.
+  path: `file:///C:/Users/dcortassa/AppData/Roaming/pingping/data/logs`.
 - The helper `fileURL` is split in two, the part that builds the URL from a
   slash path is testable on every platform, so the Windows case is covered by
   the tests of a Linux build.
@@ -311,3 +311,20 @@
 - The chart refreshes every second on its own ticker, updating both the axis
   labels and the raster. The labels are computed from "now", so they slide
   continuously as time passes.
+
+## 2026-10-21 - Rename to PingPing
+
+### Observations
+
+- The project was called SuperPinger, the name did not match what the tool
+  does, a ping monitor.
+
+### Decisions
+
+- The name is now PingPing, the module path is `github.com/pingping/pingping`
+  and the binary is `pingping`. The identifier of the Fyne application is
+  `com.pingping.pingping`.
+- The configuration and the data directory follow the name, they are now
+  `~/.config/pingping` on Linux, `~/Library/Application Support/pingping` on
+  macOS and `%AppData%\pingping` on Windows. The old directory is not read
+  anymore, the configuration has to be moved by hand.

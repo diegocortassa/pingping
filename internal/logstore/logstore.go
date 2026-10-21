@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/superping/superping/internal/model"
+	"github.com/pingping/pingping/internal/model"
 )
 
 // FileNamePattern is the pattern of the daily log files.

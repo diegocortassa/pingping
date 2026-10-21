@@ -1,4 +1,4 @@
-// Package ui implements the Fyne user interface of SuperPinger.
+// Package ui implements the Fyne user interface of PingPing.
 package ui
 
 import (
@@ -12,12 +12,12 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/superping/superping/assets/icons"
-	"github.com/superping/superping/internal/config"
-	"github.com/superping/superping/internal/history"
-	"github.com/superping/superping/internal/logstore"
-	"github.com/superping/superping/internal/model"
-	"github.com/superping/superping/internal/monitor"
+	"github.com/pingping/pingping/assets/icons"
+	"github.com/pingping/pingping/internal/config"
+	"github.com/pingping/pingping/internal/history"
+	"github.com/pingping/pingping/internal/logstore"
+	"github.com/pingping/pingping/internal/model"
+	"github.com/pingping/pingping/internal/monitor"
 )
 
 // Columns of the target table.
@@ -34,7 +34,7 @@ const (
 // tableHeaders are the column titles of the target table.
 var tableHeaders = []string{"Address", "Interval", "Status", "Last", "Average", "Loss"}
 
-// App is the graphical user interface of SuperPinger.
+// App is the graphical user interface of PingPing.
 type App struct {
 	cfg     *config.Config
 	cfgPath string
@@ -72,7 +72,7 @@ func New(cfg *config.Config, cfgPath string, mon *monitor.Monitor, hist *history
 // Run starts the graphical user interface and blocks until the application is
 // closed.
 func (a *App) Run() {
-	a.setup(app.NewWithID("com.superping.superping"))
+	a.setup(app.NewWithID("com.pingping.pingping"))
 	a.win.ShowAndRun()
 	if a.stop != nil {
 		a.stop()
@@ -84,7 +84,7 @@ func (a *App) setup(fyneApp fyne.App) {
 	a.fyneApp = fyneApp
 	a.fyneApp.SetIcon(icons.App())
 
-	a.win = a.fyneApp.NewWindow("SuperPinger")
+	a.win = a.fyneApp.NewWindow("PingPing")
 	a.win.SetIcon(icons.App())
 	a.win.Resize(fyne.NewSize(1020, 640))
 	a.win.SetMainMenu(fyne.NewMainMenu(a.mainMenu(), a.helpMenu()))
@@ -105,7 +105,7 @@ func (a *App) setup(fyneApp fyne.App) {
 
 // mainMenu returns the menu bar of the window.
 func (a *App) mainMenu() *fyne.Menu {
-	return fyne.NewMenu("SuperPinger",
+	return fyne.NewMenu("PingPing",
 		fyne.NewMenuItem("Add target", a.addTarget),
 		fyne.NewMenuItem("Settings", a.showSettings),
 		fyne.NewMenuItem("Quit", func() { a.fyneApp.Quit() }),
@@ -126,7 +126,7 @@ func (a *App) setupTray() {
 		return
 	}
 	desk.SetSystemTrayIcon(icons.Tray())
-	desk.SetSystemTrayMenu(fyne.NewMenu("SuperPinger",
+	desk.SetSystemTrayMenu(fyne.NewMenu("PingPing",
 		fyne.NewMenuItem("Show", func() { a.win.Show() }),
 		fyne.NewMenuItem("Hide", func() { a.win.Hide() }),
 		fyne.NewMenuItem("Quit", func() { a.fyneApp.Quit() }),

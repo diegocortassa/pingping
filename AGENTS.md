@@ -21,7 +21,7 @@ For GUI applications use Fyne
 - If a problem can be solved in a simpler way, propose it.
 
 ## Introduction
-SuperPinger is a network monitoring tool designed to provide real-time insights into the status and performance of an user's network connection. It aims to be simple, minimal, and efficient while offering accurate and actionable information. It allows the user to configure one or more addresses to ping. It keeps a log of the ping results for historical analysis and troubleshooting. It plots a graphical representation of the network performance over time for each monitored address in real time. The displayed graphics length is configurable and defaults to 1 hour. The history is logged so if the user wants to review past network performance, they can do so easily. Logs are stored persistently for future reference and rotated every 24 hours.
+PingPing is a network monitoring tool designed to provide real-time insights into the status and performance of an user's network connection. It aims to be simple, minimal, and efficient while offering accurate and actionable information. It allows the user to configure one or more addresses to ping. It keeps a log of the ping results for historical analysis and troubleshooting. It plots a graphical representation of the network performance over time for each monitored address in real time. The displayed graphics length is configurable and defaults to 1 hour. The history is logged so if the user wants to review past network performance, they can do so easily. Logs are stored persistently for future reference and rotated every 24 hours.
 
 ## Technical Details
 -It is written in Go and portable to Linux, Windows and MacOS.

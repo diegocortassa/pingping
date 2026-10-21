@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/superping/superping/internal/model"
+	"github.com/pingping/pingping/internal/model"
 )
 
 // maxSamplesPerTarget caps the memory used by a single target. The window is
@@ -157,13 +157,6 @@ func (h *History) Forget(targetID string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	delete(h.series, targetID)
-}
-
-// pruneLocked removes the samples that are older than the window. It is kept
-// for compatibility and does nothing because the pruning is done when
-// samples and statistics are read.
-func (h *History) pruneLocked(now time.Time) {
-	_ = now
 }
 
 // statsOf computes the statistics of a list of samples.

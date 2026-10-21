@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/superping/superping/internal/config"
-	"github.com/superping/superping/internal/model"
-	"github.com/superping/superping/internal/ping"
+	"github.com/pingping/pingping/internal/config"
+	"github.com/pingping/pingping/internal/model"
+	"github.com/pingping/pingping/internal/ping"
 )
 
 // restartDelay is the pause between two attempts when the probe loop died,

@@ -21,10 +21,12 @@
 - [x] Actionable error for the blocked unprivileged ICMP socket on Linux, the
       root cause is reported and the `ping_group_range` command is shown in
       the interface and in the log.
-- [x] `superping -diagnose` command that opens both ICMP sockets and reports
+- [x] `pingping -diagnose` command that opens both ICMP sockets and reports
       the group range, the capabilities of the process and the fix.
 - [x] Windows executable with the application icon and the version information
       of the file properties, embedded with go-winres.
+- [x] Rename to PingPing: the module path, the binary, the configuration
+      directory, the Fyne application identifier and the documentation.
 
 ## Doing
 

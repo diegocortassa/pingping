@@ -1,4 +1,4 @@
-# SuperPinger - Development Plan
+# PingPing - Development Plan
 
 ## 1. Goal
 

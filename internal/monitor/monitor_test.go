@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/superping/superping/internal/config"
-	"github.com/superping/superping/internal/model"
-	"github.com/superping/superping/internal/ping"
+	"github.com/pingping/pingping/internal/config"
+	"github.com/pingping/pingping/internal/model"
+	"github.com/pingping/pingping/internal/ping"
 )
 
 // fakePinger reports a fixed number of samples and then stops.

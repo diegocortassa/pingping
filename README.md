@@ -1,10 +1,10 @@
-# SuperPinger
+# PingPing
 
-A portable network monitoring tool. SuperPinger pings the addresses you configure,
+A portable network monitoring tool. PingPing pings the addresses you configure,
 shows the round trip time in real time, keeps a daily rotated log of every probe
 and stays in the system tray while it monitors.
 
-![SuperPinger](assets/icons/icon.png)
+![PingPing](assets/icons/icon.png)
 
 ## Features
 
@@ -32,7 +32,7 @@ graph of the selected target on the right.
 
 ## Installation
 
-SuperPinger is portable: download the archive of your platform, unpack it and
+PingPing is portable: download the archive of your platform, unpack it and
 run the binary. There is no installer and no system wide configuration.
 
 The program stores its configuration and its logs in the user configuration
@@ -40,15 +40,19 @@ directory of the operating system:
 
 | Platform | Configuration | Logs |
 | -------- | ------------- | ---- |
-| Linux | `~/.config/superping/config.json` | `~/.config/superping/data/logs` |
-| macOS | `~/Library/Application Support/superping/config.json` | `~/Library/Application Support/superping/data/logs` |
-| Windows | `%AppData%\superping\config.json` | `%AppData%\superping\data\logs` |
+| Linux | `~/.config/pingping/config.json` | `~/.config/pingping/data/logs` |
+| macOS | `~/Library/Application Support/pingping/config.json` | `~/Library/Application Support/pingping/data/logs` |
+| Windows | `%AppData%\pingping\config.json` | `%AppData%\pingping\data\logs` |
+
+The application was called SuperPinger before, the configuration and the
+logs of the old versions are in the `superping` directory, they have to be
+moved by hand.
 
 A `config.json` in the folder the program is started from replaces the one of
 the user configuration directory, the two setups are then independent. It
 makes a portable installation possible, copy the configuration file next to
 the binary and the program uses it. The path of the file in use is shown in
-`SuperPinger -> Settings`. The `-config` flag has the priority over both of
+`PingPing -> Settings`. The `-config` flag has the priority over both of
 them.
 
 The logs stay where the configuration file says, a fully portable
@@ -63,7 +67,7 @@ installation needs a `dataDir` next to the configuration file:
 ## Usage
 
 Start the application and add the addresses you want to watch with the `Add`
-button or with `SuperPinger -> Add target`.
+button or with `PingPing -> Add target`.
 
 The add and edit dialog takes four fields:
 
@@ -77,7 +81,7 @@ The add and edit dialog takes four fields:
 Selecting a row of the table shows the graph of that target. The summary line
 below the graph holds the statistics of the visible window.
 
-The `Settings` item of the `SuperPinger` menu opens the application settings:
+The `Settings` item of the `PingPing` menu opens the application settings:
 
 | Setting | Description |
 | ------- | ----------- |
@@ -93,7 +97,7 @@ The menu bar holds two menus:
 
 | Menu | Items |
 | ---- | ----- |
-| `SuperPinger` | Add target, Settings, Quit. |
+| `PingPing` | Add target, Settings, Quit. |
 | `Help` | About, it shows the icon, the name, the version and the author. |
 
 ### ICMP mode
@@ -119,7 +123,7 @@ Linux has two ways to open an ICMP socket:
 The `ping` command never needs the sysctl because the binary itself carries
 the privilege: on Ubuntu and Debian it has the file capability
 `cap_net_raw=ep`, on older distributions it is setuid root. A plain program
-like SuperPinger has no such privilege, so it can only use the datagram
+like PingPing has no such privilege, so it can only use the datagram
 socket, and that is what `net.ipv4.ping_group_range` controls. The default
 value `1 0` means that no group at all may open one, so a normal user gets:
 
@@ -134,13 +138,13 @@ Two ways to fix it:
 # 1. allow the datagram socket for every local user, one line, no root at runtime
 sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
 
-# 2. give SuperPinger the same capability the ping command has
-sudo setcap cap_net_raw=ep /path/to/superping
+# 2. give PingPing the same capability the ping command has
+sudo setcap cap_net_raw=ep /path/to/pingping
 ```
 
 Option 1 is what Debian and Ubuntu ship in
 `/usr/lib/sysctl.d/iputils-ping.conf`. To make it permanent, create
-`/etc/sysctl.d/99-superping.conf` with:
+`/etc/sysctl.d/99-pingping.conf` with:
 
 ```
 net.ipv4.ping_group_range = 0 2147483647
@@ -155,11 +159,11 @@ it has to be set again after every update.
 To see what the system allows, run:
 
 ```bash
-superping -diagnose
+pingping -diagnose
 ```
 
 ```
-superping 0.1.1 - ICMP diagnostics
+pingping 0.1.1 - ICMP diagnostics
 
 OS: linux
 user: ubuntu (uid=1000, gid=1000)
@@ -185,7 +189,7 @@ reads `error` and the line below the graph holds the reason.
 ### Command line
 
 ```
-Usage of superping:
+Usage of pingping:
   -config string
         path of the configuration file
   -data-dir string
@@ -229,7 +233,7 @@ change, so it can be edited by hand as well:
   "graphWindow": "1h",
   "logRetentionDays": 30,
   "icmpMode": "auto",
-  "dataDir": "/home/user/.config/superping/data"
+  "dataDir": "/home/user/.config/pingping/data"
 }
 ```
 
@@ -254,7 +258,7 @@ sudo apt-get install libgl1-mesa-dev xorg-dev libglx-dev libwayland-dev \
 make build
 ```
 
-The binary is written to `dist/superping`. The version is taken from the git
+The binary is written to `dist/pingping`. The version is taken from the git
 tags, it can be overridden:
 
 ```bash
@@ -272,7 +276,7 @@ make install-tools   # installs go-winres, needed for the icon and the version i
 make build-windows
 ```
 
-It is written to `dist/superping.exe`. Fyne needs cgo for the graphics
+It is written to `dist/pingping.exe`. Fyne needs cgo for the graphics
 libraries, so the cross compiler and `CGO_ENABLED=1` are mandatory, Go turns
 cgo off by itself when the target platform differs from the host. The binary
 is linked against the Windows GUI subsystem, so it does not open a console

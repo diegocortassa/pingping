@@ -8,11 +8,11 @@ import (
 	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/superping/superping/internal/config"
-	"github.com/superping/superping/internal/history"
-	"github.com/superping/superping/internal/logstore"
-	"github.com/superping/superping/internal/model"
-	"github.com/superping/superping/internal/monitor"
+	"github.com/pingping/pingping/internal/config"
+	"github.com/pingping/pingping/internal/history"
+	"github.com/pingping/pingping/internal/logstore"
+	"github.com/pingping/pingping/internal/model"
+	"github.com/pingping/pingping/internal/monitor"
 )
 
 func newTestApp(t *testing.T, targets ...config.Target) (*App, *history.History) {

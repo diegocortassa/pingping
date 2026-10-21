@@ -1,4 +1,4 @@
-module github.com/superping/superping
+module github.com/pingping/pingping
 
 go 1.27.3
 

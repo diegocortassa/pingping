@@ -3,7 +3,7 @@ package appinfo
 
 const (
 	// Name is the name of the application.
-	Name = "SuperPinger"
+	Name = "PingPing"
 
 	// Author is the author of the application.
 	Author = "Diego Cortassa"
@@ -13,4 +13,4 @@ const (
 )
 
 // Version is the semantic version of the application, the build sets it.
-var Version = "0.1.9"
+var Version = "0.2.0"

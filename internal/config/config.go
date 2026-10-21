@@ -1,4 +1,4 @@
-// Package config holds the persistent configuration of SuperPinger.
+// Package config holds the persistent configuration of PingPing.
 //
 // The configuration is stored as JSON. Field names use camelCase, durations
 // are stored as human readable strings such as "5s" or "1h".
@@ -128,9 +128,9 @@ func Default() Config {
 func DefaultPath() string {
 	dir, err := os.UserConfigDir()
 	if err != nil {
-		return "superping.json"
+		return "pingping.json"
 	}
-	return filepath.Join(dir, "superping", "config.json")
+	return filepath.Join(dir, "pingping", "config.json")
 }
 
 // ResolvePath returns the path of the configuration file to use. An explicit
@@ -154,9 +154,9 @@ func ResolvePath(explicit string) string {
 func DefaultDataDir() string {
 	dir, err := os.UserConfigDir()
 	if err != nil {
-		return "superping-data"
+		return "pingping-data"
 	}
-	return filepath.Join(dir, "superping", "data")
+	return filepath.Join(dir, "pingping", "data")
 }
 
 // Load reads the configuration from path. A missing file yields the default

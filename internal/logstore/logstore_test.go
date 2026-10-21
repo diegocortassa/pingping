@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/superping/superping/internal/model"
+	"github.com/pingping/pingping/internal/model"
 )
 
 func readFile(t *testing.T, path string) [][]string {

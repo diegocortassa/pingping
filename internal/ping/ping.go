@@ -1,4 +1,4 @@
-// Package ping wraps the ICMP echo implementation used by SuperPinger.
+// Package ping wraps the ICMP echo implementation used by PingPing.
 //
 // The library underneath (github.com/prometheus-community/pro-bing) reports
 // every packet it sends and every reply it receives, but it has no notion of
@@ -16,7 +16,7 @@ import (
 
 	"github.com/prometheus-community/pro-bing"
 
-	"github.com/superping/superping/internal/config"
+	"github.com/pingping/pingping/internal/config"
 )
 
 // Result is the outcome of a single probe.

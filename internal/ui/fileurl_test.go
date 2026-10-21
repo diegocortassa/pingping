@@ -14,13 +14,13 @@ func TestPathURL(t *testing.T) {
 	}{
 		{
 			name: "windows drive",
-			path: "C:/Users/dcortassa/AppData/Roaming/superping/data/logs",
-			want: "file:///C:/Users/dcortassa/AppData/Roaming/superping/data/logs",
+			path: "C:/Users/dcortassa/AppData/Roaming/pingping/data/logs",
+			want: "file:///C:/Users/dcortassa/AppData/Roaming/pingping/data/logs",
 		},
 		{
 			name: "unix path",
-			path: "/home/user/.config/superping/data/logs",
-			want: "file:///home/user/.config/superping/data/logs",
+			path: "/home/user/.config/pingping/data/logs",
+			want: "file:///home/user/.config/pingping/data/logs",
 		},
 	}
 
@@ -42,8 +42,8 @@ func TestPathURL(t *testing.T) {
 
 func TestPathURLIsParsable(t *testing.T) {
 	for _, path := range []string{
-		"C:/Users/dcortassa/AppData/Roaming/superping/data/logs",
-		"/home/user/.config/superping/data/logs",
+		"C:/Users/dcortassa/AppData/Roaming/pingping/data/logs",
+		"/home/user/.config/pingping/data/logs",
 	} {
 		link := pathURL(path)
 		parsed, err := url.Parse(link.String())

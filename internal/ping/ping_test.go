@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/superping/superping/internal/config"
+	"github.com/pingping/pingping/internal/config"
 )
 
 // fakeProber simulates an ICMP session.

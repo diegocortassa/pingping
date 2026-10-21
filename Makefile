@@ -1,14 +1,14 @@
-BINARY   := superping
+BINARY   := pingping
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.1.0)
+PKGVER   := $(shell echo $(VERSION) | sed 's/^v//; s/-.*//')
 DIST     := dist
-PKG      := github.com/superping/superping
+PKG      := github.com/pingping/pingping
 LDFLAGS  := -s -w -X $(PKG)/internal/appinfo.Version=$(VERSION)
 WINFLAGS := $(LDFLAGS) -H=windowsgui
 GOFLAGS  := -trimpath
 GOBIN    := $(shell go env GOPATH)/bin
 WIN_CC   ?= x86_64-w64-mingw32-gcc
 WINRES   := rsrc_windows_amd64.syso
-WINVER   := $(shell echo $(VERSION) | sed 's/^v//; s/-.*//')
 
 .PHONY: all build build-windows windows-resource test audit run clean icons install-tools deb rpm
 
@@ -26,10 +26,10 @@ windows-resource:
 		--arch amd64 \
 		--manifest gui \
 		--icon assets/icons/icon.png \
-		--product-version $(WINVER).0 \
-		--file-version $(WINVER).0 \
+		--product-version $(PKGVER).0 \
+		--file-version $(PKGVER).0 \
 		--file-description "Portable network monitoring tool with real time ping graphs" \
-		--product-name "SuperPinger" \
+		--product-name "PingPing" \
 		--copyright "Copyright (c) Diego Cortassa" \
 		--original-filename "$(BINARY).exe" \
 		$(WINRES)
@@ -82,10 +82,10 @@ deb: build
 	cp $(DIST)/$(BINARY) $(DIST)/deb/usr/bin/$(BINARY)
 	cp assets/icons/icon.png $(DIST)/deb/usr/share/icons/hicolor/512x512/apps/$(BINARY).png
 	cp README.md $(DIST)/deb/usr/share/doc/$(BINARY)/README.md
-	@printf 'Package: %s\nVersion: %s\nSection: net\nPriority: optional\nArchitecture: %s\nMaintainer: SuperPinger <superping@example.com>\nDescription: Portable network monitoring tool\n Real time ping monitoring with graphs and daily rotated logs.\n' \
-		"$(BINARY)" "$(VERSION)" "$$(dpkg --print-architecture)" > $(DIST)/deb/DEBIAN/control
-	dpkg-deb --build $(DIST)/deb $(DIST)/$(BINARY)_$(VERSION)_amd64.deb
-	@echo "built $(DIST)/$(BINARY)_$(VERSION)_amd64.deb"
+	@printf 'Package: %s\nVersion: %s\nSection: net\nPriority: optional\nArchitecture: %s\nMaintainer: PingPing <pingping@example.com>\nDescription: Portable network monitoring tool\n Real time ping monitoring with graphs and daily rotated logs.\n' \
+		"$(BINARY)" "$(PKGVER)" "$$(dpkg --print-architecture)" > $(DIST)/deb/DEBIAN/control
+	dpkg-deb --build $(DIST)/deb $(DIST)/$(BINARY)_$(PKGVER)_amd64.deb
+	@echo "built $(DIST)/$(BINARY)_$(PKGVER)_amd64.deb"
 
 ## rpm: build an RPM package
 rpm: build
@@ -94,6 +94,6 @@ rpm: build
 	cp $(DIST)/$(BINARY) $(DIST)/rpm/BUILDROOT/usr/bin/$(BINARY)
 	cp assets/icons/icon.png $(DIST)/rpm/BUILDROOT/usr/share/icons/hicolor/512x512/apps/$(BINARY).png
 	@printf 'Name: %s\nVersion: %s\nRelease: 1\nSummary: Portable network monitoring tool\nLicense: BSD-3-Clause\nBuildArch: x86_64\nRequires: glibc\n%%description\nReal time ping monitoring with graphs and daily rotated logs.\n' \
-		"$(BINARY)" "$(VERSION)" > $(DIST)/rpm/SPECS/$(BINARY).spec
+		"$(BINARY)" "$(PKGVER)" > $(DIST)/rpm/SPECS/$(BINARY).spec
 	rpmbuild --define "_topdir $(CURDIR)/$(DIST)/rpm" -bb $(DIST)/rpm/SPECS/$(BINARY).spec
-	@echo "built $(DIST)/rpm/RPMS/x86_64/$(BINARY)-$(VERSION)-1.x86_64.rpm"
+	@echo "built $(DIST)/rpm/RPMS/x86_64/$(BINARY)-$(PKGVER)-1.x86_64.rpm"

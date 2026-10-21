@@ -7,8 +7,8 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/superping/superping/assets/icons"
-	"github.com/superping/superping/internal/appinfo"
+	"github.com/pingping/pingping/assets/icons"
+	"github.com/pingping/pingping/internal/appinfo"
 )
 
 // showAbout opens the dialog with the information about the application.

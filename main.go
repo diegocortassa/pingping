@@ -1,4 +1,4 @@
-// Command superping is a portable network monitoring tool. It pings the
+// Command pingping is a portable network monitoring tool. It pings the
 // configured addresses, shows the round trip time in real time and keeps a
 // daily rotated log of every probe.
 package main
@@ -12,14 +12,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/superping/superping/internal/appinfo"
-	"github.com/superping/superping/internal/config"
-	"github.com/superping/superping/internal/history"
-	"github.com/superping/superping/internal/logstore"
-	"github.com/superping/superping/internal/model"
-	"github.com/superping/superping/internal/monitor"
-	"github.com/superping/superping/internal/ping"
-	"github.com/superping/superping/internal/ui"
+	"github.com/pingping/pingping/internal/appinfo"
+	"github.com/pingping/pingping/internal/config"
+	"github.com/pingping/pingping/internal/history"
+	"github.com/pingping/pingping/internal/logstore"
+	"github.com/pingping/pingping/internal/model"
+	"github.com/pingping/pingping/internal/monitor"
+	"github.com/pingping/pingping/internal/ping"
+	"github.com/pingping/pingping/internal/ui"
 )
 
 func main() {
@@ -32,12 +32,12 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("superping %s\n", appinfo.Version)
+		fmt.Printf("pingping %s\n", appinfo.Version)
 		return
 	}
 
 	if *diagnose {
-		fmt.Printf("superping %s - ICMP diagnostics\n\n", appinfo.Version)
+		fmt.Printf("pingping %s - ICMP diagnostics\n\n", appinfo.Version)
 		fmt.Print(ping.Diagnose().String())
 		return
 	}
@@ -46,20 +46,20 @@ func main() {
 
 	cfg, err := config.Load(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "superping: %v\n", err)
+		fmt.Fprintf(os.Stderr, "pingping: %v\n", err)
 		os.Exit(1)
 	}
 	if *dataDir != "" {
 		cfg.DataDir = *dataDir
 	}
 	if err := config.Save(path, cfg); err != nil {
-		fmt.Fprintf(os.Stderr, "superping: %v\n", err)
+		fmt.Fprintf(os.Stderr, "pingping: %v\n", err)
 		os.Exit(1)
 	}
 
 	store, err := logstore.New(cfg.LogDir(), time.Duration(cfg.LogRetentionDays)*24*time.Hour)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "superping: %v\n", err)
+		fmt.Fprintf(os.Stderr, "pingping: %v\n", err)
 		os.Exit(1)
 	}
 	defer store.Close()
@@ -70,7 +70,7 @@ func main() {
 	mon.SetSink(func(s model.Sample) {
 		hist.Add(s)
 		if err := store.Write(s); err != nil {
-			fmt.Fprintf(os.Stderr, "superping: %v\n", err)
+			fmt.Fprintf(os.Stderr, "pingping: %v\n", err)
 		}
 	})
 	for _, target := range cfg.Targets {

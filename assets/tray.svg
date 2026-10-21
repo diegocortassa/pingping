@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
-  <title id="title">SuperPinger tray icon</title>
+  <title id="title">PingPing tray icon</title>
   <desc id="desc">A tiny orange ping mascot with wireless arcs and a network connection.</desc>
   <g fill="none" stroke="#FF7900" stroke-width="3.5" stroke-linecap="round">
     <path d="M37 7a20 20 0 0 1 17 17"/>

@@ -13,7 +13,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/superping/superping/internal/model"
+	"github.com/pingping/pingping/internal/model"
 )
 
 // Chart geometry in device independent pixels.

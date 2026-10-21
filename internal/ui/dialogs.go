@@ -13,7 +13,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/superping/superping/internal/config"
+	"github.com/pingping/pingping/internal/config"
 )
 
 // graphWindowOptions are the selectable lengths of the graph window.
