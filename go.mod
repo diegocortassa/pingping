@@ -5,6 +5,7 @@ go 1.27.3
 require (
 	fyne.io/fyne/v2 v2.8.2
 	github.com/prometheus-community/pro-bing v0.9.1
+	golang.org/x/net v0.56.0
 )
 
 require (
@@ -39,7 +40,6 @@ require (
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/yuin/goldmark v1.8.2 // indirect
 	golang.org/x/image v0.43.0 // indirect
-	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect

@@ -86,22 +86,38 @@ working flavour by itself.
 
 ### Linux and unprivileged ICMP
 
-Linux restricts the unprivileged ICMP sockets to the groups listed in
-`net.ipv4.ping_group_range`, which is empty by default. As a normal user the
-probes then fail with:
+Linux has two ways to open an ICMP socket:
+
+| Socket | Needs | Used by |
+| ------ | ----- | ------- |
+| raw (`SOCK_RAW`) | the `CAP_NET_RAW` capability, so root or a file capability | the `ping` command, it ships with `cap_net_raw=ep` |
+| datagram (`SOCK_DGRAM`) | the group of the user inside `net.ipv4.ping_group_range` | unprivileged programs |
+
+The `ping` command never needs the sysctl because the binary itself carries
+the privilege: on Ubuntu and Debian it has the file capability
+`cap_net_raw=ep`, on older distributions it is setuid root. A plain program
+like SuperPinger has no such privilege, so it can only use the datagram
+socket, and that is what `net.ipv4.ping_group_range` controls. The default
+value `1 0` means that no group at all may open one, so a normal user gets:
 
 ```
 socket: permission denied: unprivileged ICMP is blocked, allow it with:
 sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
 ```
 
-The fix is one command, run it once as root:
+Two ways to fix it:
 
 ```bash
+# 1. allow the datagram socket for every local user, one line, no root at runtime
 sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+
+# 2. give SuperPinger the same capability the ping command has
+sudo setcap cap_net_raw=ep /path/to/superping
 ```
 
-To make it permanent, create `/etc/sysctl.d/99-superping.conf` with:
+Option 1 is what Debian and Ubuntu ship in
+`/usr/lib/sysctl.d/iputils-ping.conf`. To make it permanent, create
+`/etc/sysctl.d/99-superping.conf` with:
 
 ```
 net.ipv4.ping_group_range = 0 2147483647
@@ -109,10 +125,39 @@ net.ipv4.ping_group_range = 0 2147483647
 
 and run `sudo sysctl --system`.
 
+Option 2 keeps the system strict, but the file capability needs a filesystem
+with extended attribute support, it is lost when the binary is replaced and
+it has to be set again after every update.
+
+To see what the system allows, run:
+
+```bash
+superping -diagnose
+```
+
+```
+superping 0.1.1 - ICMP diagnostics
+
+OS: linux
+user: ubuntu (uid=1000, gid=1000)
+net.ipv4.ping_group_range: 1 0
+capabilities: none
+
+unprivileged ICMP socket (SOCK_DGRAM): FAILED
+    socket: permission denied
+privileged ICMP socket (SOCK_RAW): FAILED
+    listen ip4:icmp 0.0.0.0: socket: operation not permitted
+
+How to fix it:
+  the unprivileged socket needs the group of the user inside
+  net.ipv4.ping_group_range:
+      sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+  the privileged socket needs root or the CAP_NET_RAW capability:
+      sudo setcap cap_net_raw=ep <path of the binary>
+```
+
 The same error is shown in the interface: the status column of the target
-reads `error` and the line below the graph holds the reason. Without the
-sysctl the only other option is to run SuperPinger as root or to grant it the
-`CAP_NET_RAW` capability.
+reads `error` and the line below the graph holds the reason.
 
 ### Command line
 
@@ -122,6 +167,8 @@ Usage of superping:
         path of the configuration file
   -data-dir string
         directory of the persistent data
+  -diagnose
+        report the ICMP capabilities of the system and exit
   -version
         print the version and exit
 ```

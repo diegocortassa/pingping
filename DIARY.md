@@ -89,11 +89,18 @@
   sockets to the groups listed in `net.ipv4.ping_group_range`, which is empty
   by default, and the raw socket needs `CAP_NET_RAW`.
   See https://www.kernel.org/doc/html/latest/networking/ip-sysctl.html
+- The `ping` command needs no sysctl because the binary carries the privilege
+  itself: `getcap /usr/bin/ping` shows `cap_net_raw=ep` on Ubuntu and Debian,
+  older distributions use the setuid bit. The sysctl has nothing to do with
+  the command, it exists for the programs that have no privilege at all.
 - The fix is `sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"`, the
   same value Debian and Ubuntu ship in `/usr/lib/sysctl.d/iputils-ping.conf`.
+  The alternative is `sudo setcap cap_net_raw=ep <binary>`, the same
+  capability the `ping` binary has.
 - Reproduced in the container with the `ubuntu` user (uid 1000) and the range
   `0 0`: the unprivileged socket fails with `EACCES` and the privileged one
-  with `EPERM`, exactly as reported.
+  with `EPERM`, exactly as reported. The container also drops `CAP_NET_RAW`
+  from the bounding set, so even the system `ping` fails there.
 - The `auto` mode reported the error of the last attempt, the privileged one,
   which hides the root cause. The unprivileged error is the one the user can
   act on.
@@ -108,3 +115,7 @@
 - The samples carry an `offline` flag, it tells the interface that the probe
   was never sent, so the status column reads `error` instead of `down` and the
   reason is shown below the graph.
+- `superping -diagnose` opens both ICMP sockets and prints what the system
+  allows, the group range and the capabilities of the process, with the
+  command that fixes it. It answers the question the error alone does not:
+  why does the `ping` command work without any change.

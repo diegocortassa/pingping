@@ -17,22 +17,30 @@ import (
 	"github.com/superping/superping/internal/logstore"
 	"github.com/superping/superping/internal/model"
 	"github.com/superping/superping/internal/monitor"
+	"github.com/superping/superping/internal/ping"
 	"github.com/superping/superping/internal/ui"
 )
 
 // version is the semantic version of the application.
-var version = "0.1.1"
+var version = "0.1.2"
 
 func main() {
 	var (
 		configPath  = flag.String("config", "", "path of the configuration file")
 		dataDir     = flag.String("data-dir", "", "directory of the persistent data")
 		showVersion = flag.Bool("version", false, "print the version and exit")
+		diagnose    = flag.Bool("diagnose", false, "report the ICMP capabilities of the system and exit")
 	)
 	flag.Parse()
 
 	if *showVersion {
 		fmt.Printf("superping %s\n", version)
+		return
+	}
+
+	if *diagnose {
+		fmt.Printf("superping %s - ICMP diagnostics\n\n", version)
+		fmt.Print(ping.Diagnose().String())
 		return
 	}
 
