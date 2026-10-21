@@ -251,6 +251,7 @@ The Windows executable is built from Linux with the mingw cross compiler:
 
 ```bash
 sudo apt-get install gcc-mingw-w64-x86-64
+make install-tools   # installs go-winres, needed for the icon and the version information
 
 make build-windows
 ```
@@ -260,6 +261,12 @@ libraries, so the cross compiler and `CGO_ENABLED=1` are mandatory, Go turns
 cgo off by itself when the target platform differs from the host. The binary
 is linked against the Windows GUI subsystem, so it does not open a console
 window.
+
+The `windows-resource` target writes the icon and the version information of
+the file properties into `rsrc_windows_amd64.syso`, the Go linker embeds it
+into the executable. The icon is the one of the application, resized to the
+sizes Windows expects, and the manifest asks for the administrator rights,
+the raw ICMP sockets of Windows need them.
 
 The compiler can be changed with `WIN_CC`:
 

@@ -220,3 +220,29 @@
   the tests of a Linux build.
 - The URL is escaped by the URL builder, a log folder with a space in the path
   works too.
+
+## 2026-10-21 - Windows resources
+
+### Observations
+
+- The Windows executable had no icon, Windows shows the default one of the
+  applications. The icon of the application was only embedded in the binary
+  for Fyne, the shell does not read it from there.
+- Fyne sets the icon of the window at runtime, the icon of the file in the
+  explorer is a resource of the executable, it needs the resource section of
+  the PE file.
+
+### Decisions
+
+- The `windows-resource` target runs go-winres, it writes the icon, the
+  version information and the manifest into `rsrc_windows_amd64.syso`. The Go
+  linker embeds the file into the executable, the suffix keeps it out of the
+  builds for the other platforms.
+- The icon is the PNG of the application, go-winres resizes it to the sizes
+  Windows expects (256, 64, 48, 32 and 16 pixels).
+- The manifest is the GUI one, it asks for the per monitor v2 DPI awareness
+  and for the administrator rights, the raw ICMP sockets of Windows need
+  them.
+- The version of the file properties is numeric, the tag is cleaned of its
+  prefix and of the dirty suffix, so the properties show `0.1.7.0` and not
+  `v0.1.7-1-gca5b93f-dirty`.

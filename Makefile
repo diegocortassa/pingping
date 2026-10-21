@@ -7,8 +7,10 @@ WINFLAGS := $(LDFLAGS) -H=windowsgui
 GOFLAGS  := -trimpath
 GOBIN    := $(shell go env GOPATH)/bin
 WIN_CC   ?= x86_64-w64-mingw32-gcc
+WINRES   := rsrc_windows_amd64.syso
+WINVER   := $(shell echo $(VERSION) | sed 's/^v//; s/-.*//')
 
-.PHONY: all build build-windows test audit run clean icons install-tools deb rpm
+.PHONY: all build build-windows windows-resource test audit run clean icons install-tools deb rpm
 
 all: build
 
@@ -18,8 +20,23 @@ build:
 	CGO_ENABLED=1 go build $(GOFLAGS) -ldflags '$(LDFLAGS)' -o $(DIST)/$(BINARY) .
 	@echo "built $(DIST)/$(BINARY) $(VERSION)"
 
+## windows-resource: write the icon and the version information into a Windows resource file
+windows-resource:
+	$(GOBIN)/go-winres simply \
+		--arch amd64 \
+		--manifest gui \
+		--admin \
+		--icon assets/icons/icon.png \
+		--product-version $(WINVER).0 \
+		--file-version $(WINVER).0 \
+		--file-description "Portable network monitoring tool with real time ping graphs" \
+		--product-name "SuperPinger" \
+		--copyright "Copyright (c) Diego Cortassa" \
+		--original-filename "$(BINARY).exe" \
+		$(WINRES)
+
 ## build-windows: cross compile the Windows executable into $(DIST)
-build-windows:
+build-windows: windows-resource
 	@mkdir -p $(DIST)
 	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=$(WIN_CC) \
 		go build $(GOFLAGS) -ldflags '$(WINFLAGS)' -o $(DIST)/$(BINARY).exe .
@@ -57,6 +74,7 @@ icons:
 install-tools:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 	go install golang.org/x/vuln/cmd/govulncheck@latest
+	go install github.com/tc-hib/go-winres@latest
 
 ## deb: build a Debian package
 deb: build
