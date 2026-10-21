@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/superping/superping/internal/appinfo"
 	"github.com/superping/superping/internal/config"
 	"github.com/superping/superping/internal/history"
 	"github.com/superping/superping/internal/logstore"
@@ -20,9 +21,6 @@ import (
 	"github.com/superping/superping/internal/ping"
 	"github.com/superping/superping/internal/ui"
 )
-
-// version is the semantic version of the application.
-var version = "0.1.3"
 
 func main() {
 	var (
@@ -34,12 +32,12 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("superping %s\n", version)
+		fmt.Printf("superping %s\n", appinfo.Version)
 		return
 	}
 
 	if *diagnose {
-		fmt.Printf("superping %s - ICMP diagnostics\n\n", version)
+		fmt.Printf("superping %s - ICMP diagnostics\n\n", appinfo.Version)
 		fmt.Print(ping.Diagnose().String())
 		return
 	}

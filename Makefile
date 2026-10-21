@@ -2,7 +2,7 @@ BINARY   := superping
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.1.0)
 DIST     := dist
 PKG      := github.com/superping/superping
-LDFLAGS  := -s -w -X main.version=$(VERSION)
+LDFLAGS  := -s -w -X $(PKG)/internal/appinfo.Version=$(VERSION)
 GOFLAGS  := -trimpath
 GOBIN    := $(shell go env GOPATH)/bin
 

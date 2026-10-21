@@ -86,7 +86,7 @@ func (a *App) setup(fyneApp fyne.App) {
 	a.win = a.fyneApp.NewWindow("SuperPinger")
 	a.win.SetIcon(icons.App())
 	a.win.Resize(fyne.NewSize(1020, 640))
-	a.win.SetMainMenu(fyne.NewMainMenu(a.mainMenu()))
+	a.win.SetMainMenu(fyne.NewMainMenu(a.mainMenu(), a.helpMenu()))
 	a.win.SetCloseIntercept(func() { a.win.Hide() })
 
 	a.buildContent()
@@ -108,6 +108,13 @@ func (a *App) mainMenu() *fyne.Menu {
 		fyne.NewMenuItem("Add target", a.addTarget),
 		fyne.NewMenuItem("Settings", a.showSettings),
 		fyne.NewMenuItem("Quit", func() { a.fyneApp.Quit() }),
+	)
+}
+
+// helpMenu returns the help menu of the window.
+func (a *App) helpMenu() *fyne.Menu {
+	return fyne.NewMenu("Help",
+		fyne.NewMenuItem("About", a.showAbout),
 	)
 }
 

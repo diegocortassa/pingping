@@ -140,3 +140,25 @@
   relation between the two defaults.
 - The default applies to the new targets only, the targets that already exist
   keep the timeout of their configuration file.
+
+## 2026-10-21 - Help menu and about dialog
+
+### Observations
+
+- The window had a single menu, the application menu, there was no way to see
+  the version or the author of the program from the interface.
+- The version was a variable of the `main` package, so the interface could not
+  show it. The build sets it with `-X main.version`, the flag has to name the
+  variable of the package that holds it.
+
+### Decisions
+
+- The metadata of the application lives in `internal/appinfo`: the name, the
+  author, a short description and the version. The build sets the version with
+  `-X github.com/superping/superping/internal/appinfo.Version`, the `main`
+  package and the interface read the same value, so the about dialog and the
+  `-version` flag can never disagree.
+- The about dialog is built by `aboutContent`, a separate function, so the
+  content can be tested without opening a modal window.
+- The window now has a `Help` menu with the `About` item, the dialog shows the
+  application icon, the name, the version and the author.

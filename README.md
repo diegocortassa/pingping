@@ -73,6 +73,13 @@ below the graph holds the statistics of the visible window.
 Closing the window hides it, the program keeps monitoring in the system tray.
 Use the tray menu to show the window again or to quit.
 
+The menu bar holds two menus:
+
+| Menu | Items |
+| ---- | ----- |
+| `SuperPinger` | Add target, Settings, Quit. |
+| `Help` | About, it shows the icon, the name, the version and the author. |
+
 ### ICMP mode
 
 | Mode | Behaviour |
@@ -268,6 +275,7 @@ make icons
 | Package | Responsibility |
 | ------- | -------------- |
 | `internal/config` | Configuration model, JSON serialisation, defaults, paths. |
+| `internal/appinfo` | Name, author and version of the application, the build sets the version. |
 | `internal/ping` | ICMP probing, privilege fallback, per packet timeout tracking. |
 | `internal/monitor` | Target lifecycle and fan out of the samples. |
 | `internal/history` | Rolling sample buffer and the statistics. |
