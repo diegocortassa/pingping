@@ -162,3 +162,18 @@
   content can be tested without opening a modal window.
 - The window now has a `Help` menu with the `About` item, the dialog shows the
   application icon, the name, the version and the author.
+
+## 2026-10-21 - Toolbar
+
+### Observations
+
+- The settings were reachable from two places, the toolbar button and the
+  application menu. The menu is the canonical place, the button was a
+  duplicate.
+
+### Decisions
+
+- The toolbar holds only the target actions: add, edit and remove. The
+  settings stay in the `SuperPinger` menu.
+- The application keeps a reference to the toolbar, a test pins the buttons of
+  the toolbar and checks that the settings are still in the menu.

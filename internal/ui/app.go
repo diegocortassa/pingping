@@ -47,6 +47,7 @@ type App struct {
 	table   *widget.Table
 	tabs    *container.AppTabs
 	status  *widget.Label
+	toolbar *fyne.Container
 
 	rows        []config.Target
 	selectedRow int
@@ -135,11 +136,10 @@ func (a *App) setupTray() {
 
 // buildContent creates the widgets of the main window.
 func (a *App) buildContent() {
-	toolbar := container.NewHBox(
+	a.toolbar = container.NewHBox(
 		widget.NewButtonWithIcon("Add", theme.ContentAddIcon(), a.addTarget),
 		widget.NewButtonWithIcon("Edit", theme.DocumentCreateIcon(), a.editTarget),
 		widget.NewButtonWithIcon("Remove", theme.DeleteIcon(), a.removeTarget),
-		widget.NewButtonWithIcon("Settings", theme.SettingsIcon(), a.showSettings),
 	)
 
 	a.table = widget.NewTable(
@@ -157,7 +157,7 @@ func (a *App) buildContent() {
 
 	split := container.NewHSplit(a.table, a.tabs)
 	a.win.SetContent(container.NewBorder(
-		container.NewVBox(toolbar, widget.NewSeparator()),
+		container.NewVBox(a.toolbar, widget.NewSeparator()),
 		a.status,
 		nil, nil,
 		split,

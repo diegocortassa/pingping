@@ -61,7 +61,7 @@ The add and edit dialog takes four fields:
 Selecting a row of the table shows the graph of that target. The summary line
 below the graph holds the statistics of the visible window.
 
-`Settings` opens the application settings:
+The `Settings` item of the `SuperPinger` menu opens the application settings:
 
 | Setting | Description |
 | ------- | ----------- |

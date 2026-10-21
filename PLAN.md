@@ -72,8 +72,8 @@ All Fyne widget updates are funnelled through `fyne.Do`.
 ### 4.2 Dashboard
 - Left: table of targets (address, interval, status, last RTT, average, loss).
 - Right: tab container with one chart + statistics per target.
-- Toolbar: add, edit, remove, settings. The log folder is opened from the
-  settings dialog.
+- Toolbar: add, edit, remove. The settings are in the application menu, the log
+  folder is opened from the settings dialog.
 
 ### 4.3 Chart
 - X axis: time (graph window, default 1 hour).
