@@ -3,7 +3,6 @@ package ui
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -181,7 +180,7 @@ func (a *App) showSettings() {
 	folder := widget.NewLabel(a.cfg.LogDir())
 	folder.Wrapping = fyne.TextWrapWord
 	open := widget.NewButtonWithIcon("Open log folder", theme.FolderOpenIcon(), func() {
-		link, err := url.Parse("file://" + a.cfg.LogDir())
+		link, err := fileURL(a.cfg.LogDir())
 		if err != nil {
 			dialog.ShowError(err, a.win)
 			return

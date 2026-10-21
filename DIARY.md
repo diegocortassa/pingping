@@ -199,3 +199,24 @@
   compiler can be overridden with `WIN_CC`.
 - The Windows binary is linked with `-H=windowsgui`, so it does not open a
   console window.
+
+## 2026-10-21 - Windows log folder
+
+### Observations
+
+- On Windows the button "Open log folder" failed with
+  `parse "file://C:\Users\dcortassa\AppData\Roaming\superping\data\logs": invalid port ":\Users\..." after host`.
+- The URL was built by concatenating the scheme and the path. A Windows path
+  is not a URL path: the backslashes are invalid and the drive letter is
+  read as the host, so the rest of the path is parsed as the port.
+
+### Decisions
+
+- The file URL is built with `url.URL`, the path is made absolute, the
+  separators are slashes and a Windows drive gets the leading slash of a URL
+  path: `file:///C:/Users/dcortassa/AppData/Roaming/superping/data/logs`.
+- The helper `fileURL` is split in two, the part that builds the URL from a
+  slash path is testable on every platform, so the Windows case is covered by
+  the tests of a Linux build.
+- The URL is escaped by the URL builder, a log folder with a space in the path
+  works too.
