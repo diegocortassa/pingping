@@ -19,7 +19,7 @@ import (
 // Default values used when a field is missing from the configuration file.
 const (
 	DefaultInterval    = 5 * time.Second
-	DefaultTimeout     = 3 * time.Second
+	DefaultTimeout     = time.Second
 	DefaultGraphWindow = time.Hour
 	DefaultLogDays     = 30
 )

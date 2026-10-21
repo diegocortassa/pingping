@@ -119,3 +119,24 @@
   allows, the group range and the capabilities of the process, with the
   command that fixes it. It answers the question the error alone does not:
   why does the `ping` command work without any change.
+
+## 2026-10-21 - Default timeout
+
+### Observations
+
+- The default timeout of three seconds was too long for a monitor that shows
+  the state of a connection: a target that stops answering keeps the last
+  state for three seconds before it is reported as lost.
+- The timeout is a per packet deadline implemented by the tracker of the probe
+  session, the watchdog checks the in flight packets every `timeout/4` with a
+  floor of 50ms and a ceiling of one second. A one second timeout therefore
+  checks every 250ms.
+
+### Decisions
+
+- The default timeout is now one second, the default interval of five seconds
+  stays. The timeout must stay smaller than the interval, otherwise a reply
+  that arrives in time would still be reported as lost, a test pins the
+  relation between the two defaults.
+- The default applies to the new targets only, the targets that already exist
+  keep the timeout of their configuration file.

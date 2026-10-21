@@ -153,6 +153,18 @@ func TestLoadAppliesDefaults(t *testing.T) {
 	}
 }
 
+func TestDefaults(t *testing.T) {
+	if DefaultTimeout != time.Second {
+		t.Fatalf("got %v, want %v", DefaultTimeout, time.Second)
+	}
+	if DefaultInterval != 5*time.Second {
+		t.Fatalf("got %v, want %v", DefaultInterval, 5*time.Second)
+	}
+	if DefaultTimeout >= DefaultInterval {
+		t.Fatal("the default timeout must be smaller than the default interval")
+	}
+}
+
 func TestValidateRejectsBadValues(t *testing.T) {
 	tests := []struct {
 		name string

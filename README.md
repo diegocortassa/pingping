@@ -55,7 +55,7 @@ The add and edit dialog takes four fields:
 | ----- | ----------- |
 | Address | The host name or IP address to ping. |
 | Interval | The delay between two probes, for example `5s` or `1m`. |
-| Timeout | The time after which a probe is reported as lost, for example `3s`. |
+| Timeout | The time after which a probe is reported as lost, for example `1s`. |
 | Enabled | Uncheck it to keep the target but stop probing it. |
 
 Selecting a row of the table shows the graph of that target. The summary line
@@ -199,7 +199,7 @@ change, so it can be edited by hand as well:
       "id": "a1",
       "address": "1.1.1.1",
       "interval": "5s",
-      "timeout": "3s",
+      "timeout": "1s",
       "enabled": true
     }
   ],
