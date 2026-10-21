@@ -202,8 +202,20 @@ Usage of pingping:
 
 ## Logs
 
-The probes are written to one CSV file per day, named `pings-YYYY-MM-DD.csv`,
+Every target has its own CSV file, named `pings-<address>-YYYY-MM-DD.csv`,
 inside the log folder:
+
+```
+pings-1.1.1.1-2026-10-21.csv
+pings-8.8.8.8-2026-10-21.csv
+```
+
+The files are rotated every 24 hours, one file per target and per day. The
+characters that are not allowed in a file name are replaced, an IPv6 address
+becomes `2001_db8__1` for example. Two targets with the same address share
+the file, the `target_id` column tells them apart.
+
+The content of a file is:
 
 ```csv
 timestamp,target_id,address,rtt_ms,success,error

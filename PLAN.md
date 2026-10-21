@@ -19,7 +19,7 @@ Build a portable network monitoring desktop application that:
 | System tray | `desktop.App` (`SetSystemTrayIcon/Menu/Window`) | Built into Fyne, no extra dependency |
 | ICMP | `github.com/prometheus-community/pro-bing` | Maintained cross platform ICMP library, unprivileged mode on Linux, raw mode on Windows/macOS |
 | Config | JSON file in the OS user config dir | Human readable, `camelCase` fields per project conventions |
-| Logs | CSV, one file per calendar day | Simple, greppable, rotated every 24h |
+| Logs | CSV, one file per target and calendar day | Simple, greppable, rotated every 24h |
 | Graph | Custom Fyne widget (`canvas.Raster` + `canvas.Text`) | No third party chart dependency, full control over styling |
 | Icons | SVG source in `assets/`, converted to PNG with ImageMagick, embedded with `go:embed` | No runtime asset dependency, fully portable |
 
@@ -44,7 +44,7 @@ internal/config             Config/Target model, JSON (de)serialisation, default
 internal/ping               ICMP pinger wrapper, privilege fallback, timeout tracking
 internal/monitor            owns targets, drives pings, publishes samples to subscribers
 internal/history            rolling per target sample buffer + statistics
-internal/logstore           daily rotated CSV writer with retention pruning
+internal/logstore           daily rotated CSV writer, one file per target
 internal/ui                 Fyne window, tray, target table, dialogs, chart widget
 internal/ui/chart           custom real time line chart widget
 assets/                     SVG sources
@@ -82,9 +82,10 @@ All Fyne widget updates are funnelled through `fyne.Do`.
 - Data is downsampled to at most one bucket per pixel column.
 
 ### 4.4 Logging
-- `<dataDir>/logs/pings-YYYY-MM-DD.csv` with header
+- `<dataDir>/logs/pings-<address>-YYYY-MM-DD.csv` with header
   `timestamp,target_id,address,rtt_ms,success,error` (snake_case, as the
   project conventions require for stored records).
+- One file per target, the address is part of the name.
 - New file every calendar day (24h rotation).
 - Old files pruned after the configured retention (default 30 days, 0 keeps all).
 

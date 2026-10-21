@@ -1,7 +1,8 @@
 // Package logstore writes the collected samples to disk.
 //
-// One CSV file is used per calendar day, which gives the required rotation
-// every 24 hours. Files older than the configured retention are removed.
+// Every target has its own CSV file, the name holds the address and the day,
+// so the files are rotated every 24 hours. Files older than the configured
+// retention are removed.
 package logstore
 
 import (
@@ -17,21 +18,36 @@ import (
 	"github.com/pingping/pingping/internal/model"
 )
 
-// FileNamePattern is the pattern of the daily log files.
-const FileNamePattern = "pings-2006-01-02.csv"
+const (
+	// filePrefix is the prefix of the log files.
+	filePrefix = "pings-"
+	// fileSuffix is the extension of the log files.
+	fileSuffix = ".csv"
+	// dayPattern is the layout of the day inside the name of a log file.
+	dayPattern = "2006-01-02"
+	// dayLength is the length of the day inside the name of a log file.
+	dayLength = len(dayPattern)
+	// maxSlugLength is the maximum length of the address part of the name.
+	maxSlugLength = 64
+)
 
 // Header is the header line of every log file.
 var Header = []string{"timestamp", "target_id", "address", "rtt_ms", "success", "error"}
 
-// Writer appends samples to the daily log file.
+// Writer appends the samples of every target to its own log file.
 type Writer struct {
 	mu        sync.Mutex
 	dir       string
 	retention time.Duration
 	now       func() time.Time
-	file      *os.File
-	writer    *csv.Writer
-	day       string
+	files     map[string]*logFile
+}
+
+// logFile is an open log file of one target.
+type logFile struct {
+	file   *os.File
+	writer *csv.Writer
+	day    string
 }
 
 // New opens a writer for the log files in dir. A retention of zero keeps every
@@ -44,6 +60,7 @@ func New(dir string, retention time.Duration) (*Writer, error) {
 		dir:       dir,
 		retention: retention,
 		now:       time.Now,
+		files:     make(map[string]*logFile),
 	}
 	if err := w.pruneLocked(); err != nil {
 		return nil, err
@@ -51,12 +68,13 @@ func New(dir string, retention time.Duration) (*Writer, error) {
 	return w, nil
 }
 
-// Write appends a sample to the log file of the current day.
+// Write appends a sample to the log file of its target.
 func (w *Writer) Write(s model.Sample) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	if err := w.rotate(s.Time); err != nil {
+	slug := fileSlug(s.Address)
+	if err := w.rotate(slug, s.Time); err != nil {
 		return err
 	}
 
@@ -68,18 +86,26 @@ func (w *Writer) Write(s model.Sample) error {
 		strconv.FormatBool(s.Success),
 		s.Error,
 	}
-	if err := w.writer.Write(record); err != nil {
+	if err := w.files[slug].writer.Write(record); err != nil {
 		return fmt.Errorf("write log record: %w", err)
 	}
-	w.writer.Flush()
-	return w.writer.Error()
+	w.files[slug].writer.Flush()
+	return w.files[slug].writer.Error()
 }
 
-// Close flushes and closes the current log file.
+// Close flushes and closes the open log files.
 func (w *Writer) Close() error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	return w.closeFile()
+
+	var firstErr error
+	for slug, file := range w.files {
+		if err := file.close(); err != nil && firstErr == nil {
+			firstErr = err
+		}
+		delete(w.files, slug)
+	}
+	return firstErr
 }
 
 // SetRetention changes the number of days of logs that are kept and removes
@@ -92,59 +118,55 @@ func (w *Writer) SetRetention(retention time.Duration) {
 	_ = w.pruneLocked()
 }
 
-// Path returns the path of the file that is currently written.
-func (w *Writer) Path() string {
+// Dir returns the directory that holds the log files.
+func (w *Writer) Dir() string {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	if w.file == nil {
-		return ""
-	}
-	return w.file.Name()
+	return w.dir
 }
 
-// rotate opens a new file when the day changed.
-func (w *Writer) rotate(now time.Time) error {
-	day := now.Format("2006-01-02")
-	if w.file != nil && w.day == day {
-		return nil
-	}
-	if err := w.closeFile(); err != nil {
-		return err
+// rotate opens a new file when the day of a target changed.
+func (w *Writer) rotate(slug string, now time.Time) error {
+	day := now.Format(dayPattern)
+	if file, ok := w.files[slug]; ok {
+		if file.day == day {
+			return nil
+		}
+		if err := file.close(); err != nil {
+			return err
+		}
+		delete(w.files, slug)
 	}
 	if err := w.pruneLocked(); err != nil {
 		return err
 	}
 
-	path := filepath.Join(w.dir, now.Format(FileNamePattern))
+	path := filepath.Join(w.dir, fileName(slug, day))
 	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return fmt.Errorf("open log file %s: %w", path, err)
 	}
-	w.file = file
-	w.writer = csv.NewWriter(file)
-	w.day = day
+	entry := &logFile{file: file, writer: csv.NewWriter(file), day: day}
 
 	if info, err := file.Stat(); err == nil && info.Size() == 0 {
-		if err := w.writer.Write(Header); err != nil {
+		if err := entry.writer.Write(Header); err != nil {
 			return fmt.Errorf("write log header: %w", err)
 		}
-		w.writer.Flush()
+		entry.writer.Flush()
 	}
+	w.files[slug] = entry
 	return nil
 }
 
-// closeFile closes the current log file.
-func (w *Writer) closeFile() error {
-	if w.file == nil {
-		return nil
+// close flushes and closes the file.
+func (f *logFile) close() error {
+	if f.writer != nil {
+		f.writer.Flush()
 	}
-	if w.writer != nil {
-		w.writer.Flush()
-	}
-	err := w.file.Close()
-	w.file = nil
-	w.writer = nil
-	w.day = ""
+	err := f.file.Close()
+	f.file = nil
+	f.writer = nil
+	f.day = ""
 	return err
 }
 
@@ -163,20 +185,64 @@ func (w *Writer) pruneLocked() error {
 		if entry.IsDir() {
 			continue
 		}
-		name := entry.Name()
-		if !strings.HasPrefix(name, "pings-") || !strings.HasSuffix(name, ".csv") {
-			continue
-		}
-		day, err := time.Parse("2006-01-02", strings.TrimSuffix(strings.TrimPrefix(name, "pings-"), ".csv"))
-		if err != nil {
+		day, ok := dayOfFile(entry.Name())
+		if !ok {
 			continue
 		}
 		if day.Add(24 * time.Hour).After(cutoff) {
 			continue
 		}
-		if err := os.Remove(filepath.Join(w.dir, name)); err != nil {
-			return fmt.Errorf("remove old log %s: %w", name, err)
+		if err := os.Remove(filepath.Join(w.dir, entry.Name())); err != nil {
+			return fmt.Errorf("remove old log %s: %w", entry.Name(), err)
 		}
 	}
 	return nil
+}
+
+// fileName returns the name of the log file of a target for a day.
+func fileName(slug, day string) string {
+	return filePrefix + slug + "-" + day + fileSuffix
+}
+
+// dayOfFile returns the day of a log file, the second result is false when the
+// name does not belong to a log file.
+func dayOfFile(name string) (time.Time, bool) {
+	if !strings.HasPrefix(name, filePrefix) || !strings.HasSuffix(name, fileSuffix) {
+		return time.Time{}, false
+	}
+	stamp := strings.TrimSuffix(strings.TrimPrefix(name, filePrefix), fileSuffix)
+	if len(stamp) < dayLength {
+		return time.Time{}, false
+	}
+	day, err := time.Parse(dayPattern, stamp[len(stamp)-dayLength:])
+	if err != nil {
+		return time.Time{}, false
+	}
+	return day, true
+}
+
+// fileSlug converts an address into the part of the name of a log file that
+// identifies the target. The characters that are not allowed in a file name
+// on every supported platform are replaced.
+func fileSlug(address string) string {
+	var b strings.Builder
+	for _, r := range strings.TrimSpace(address) {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9':
+			b.WriteRune(r)
+		case r == '.' || r == '-' || r == '_':
+			b.WriteRune(r)
+		default:
+			b.WriteRune('_')
+		}
+	}
+
+	slug := strings.Trim(b.String(), ".")
+	if slug == "" {
+		return "target"
+	}
+	if len(slug) > maxSlugLength {
+		slug = slug[:maxSlugLength]
+	}
+	return slug
 }

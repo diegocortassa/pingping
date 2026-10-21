@@ -27,6 +27,7 @@
       of the file properties, embedded with go-winres.
 - [x] Rename to PingPing: the module path, the binary, the configuration
       directory, the Fyne application identifier and the documentation.
+- [x] One CSV log file per target, rotated every 24 hours.
 
 ## Doing
 

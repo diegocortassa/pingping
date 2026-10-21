@@ -13,4 +13,4 @@ const (
 )
 
 // Version is the semantic version of the application, the build sets it.
-var Version = "0.2.0"
+var Version = "0.3.0"

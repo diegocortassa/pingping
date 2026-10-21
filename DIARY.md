@@ -328,3 +328,23 @@
   `~/.config/pingping` on Linux, `~/Library/Application Support/pingping` on
   macOS and `%AppData%\pingping` on Windows. The old directory is not read
   anymore, the configuration has to be moved by hand.
+
+## 2026-10-21 - One log file per target
+
+### Observations
+
+- All the targets wrote to the same daily CSV file, so reading the history of
+  a single target needed a filter and the files mixed unrelated data.
+
+### Decisions
+
+- Every target has its own file, named `pings-<address>-YYYY-MM-DD.csv`. The
+  address is sanitized for the file systems of all the platforms, the
+  characters that are not allowed are replaced with an underscore.
+- The rotation and the retention are unchanged, there is one file per target
+  and per day and the old ones are pruned as before. The retention reads the
+  day from the end of the name, so it still recognizes the files.
+- Two targets that probe the same address share the file, the `target_id`
+  column tells their records apart.
+- The writer keeps one open file per target, the status bar shows the log
+  directory because there is no single file anymore.

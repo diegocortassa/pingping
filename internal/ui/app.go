@@ -259,11 +259,7 @@ func (a *App) statsText(targetID string) string {
 
 // updateStatus refreshes the status bar.
 func (a *App) updateStatus() {
-	path := a.store.Path()
-	if path == "" {
-		path = a.cfg.LogDir()
-	}
-	a.status.SetText(fmt.Sprintf("%d target(s) monitored | logs: %s", len(a.rows), path))
+	a.status.SetText(fmt.Sprintf("%d target(s) monitored | logs: %s", len(a.rows), a.store.Dir()))
 }
 
 // statusText describes the state of a target.
