@@ -190,11 +190,15 @@ func (a *App) showSettings() {
 		}
 	})
 
+	cfgFile := widget.NewLabel(a.cfgPath)
+	cfgFile.Wrapping = fyne.TextWrapWord
+
 	form := widget.NewForm(
 		widget.NewFormItem("Graph window", window),
 		widget.NewFormItem("Keep logs for (days)", retention),
 		widget.NewFormItem("ICMP mode", mode),
 		widget.NewFormItem("Log folder", container.NewVBox(folder, open)),
+		widget.NewFormItem("Configuration file", cfgFile),
 	)
 
 	var dlg *dialog.CustomDialog

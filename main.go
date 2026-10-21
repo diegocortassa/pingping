@@ -42,10 +42,7 @@ func main() {
 		return
 	}
 
-	path := *configPath
-	if path == "" {
-		path = config.DefaultPath()
-	}
+	path := config.ResolvePath(*configPath)
 
 	cfg, err := config.Load(path)
 	if err != nil {

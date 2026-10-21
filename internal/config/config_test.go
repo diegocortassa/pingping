@@ -189,6 +189,65 @@ func TestValidateRejectsBadValues(t *testing.T) {
 	}
 }
 
+func TestResolvePath(t *testing.T) {
+	dir := t.TempDir()
+	chdir(t, dir)
+
+	if got := ResolvePath(""); got != DefaultPath() {
+		t.Fatalf("got %q, want %q", got, DefaultPath())
+	}
+
+	if got := ResolvePath("/tmp/explicit.json"); got != "/tmp/explicit.json" {
+		t.Fatalf("got %q, want /tmp/explicit.json", got)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, FileName), []byte("{}"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+
+	want, err := filepath.Abs(FileName)
+	if err != nil {
+		t.Fatalf("abs: %v", err)
+	}
+	if got := ResolvePath(""); got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+
+	if got := ResolvePath("/tmp/explicit.json"); got != "/tmp/explicit.json" {
+		t.Fatalf("got %q, want /tmp/explicit.json", got)
+	}
+}
+
+func TestResolvePathIgnoresDirectory(t *testing.T) {
+	dir := t.TempDir()
+	chdir(t, dir)
+
+	if err := os.Mkdir(filepath.Join(dir, FileName), 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+
+	if got := ResolvePath(""); got != DefaultPath() {
+		t.Fatalf("got %q, want %q", got, DefaultPath())
+	}
+}
+
+// chdir moves the process into dir for the duration of the test.
+func chdir(t *testing.T, dir string) {
+	t.Helper()
+	old, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(old); err != nil {
+			t.Fatalf("chdir back: %v", err)
+		}
+	})
+}
+
 func TestNewIDIsUnique(t *testing.T) {
 	seen := make(map[string]bool)
 	for i := 0; i < 100; i++ {

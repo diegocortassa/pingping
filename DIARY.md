@@ -246,3 +246,24 @@
 - The version of the file properties is numeric, the tag is cleaned of its
   prefix and of the dirty suffix, so the properties show `0.1.7.0` and not
   `v0.1.7-1-gca5b93f-dirty`.
+
+## 2026-10-21 - Configuration file in the working directory
+
+### Observations
+
+- The application is portable, the binary can be copied anywhere, but the
+  configuration always came from the user configuration directory. A user
+  with several setups, or with a configuration shared between machines, had
+  to move the file by hand every time.
+
+### Decisions
+
+- A `config.json` in the working directory replaces the one of the user
+  configuration directory. The `-config` flag keeps the priority over both,
+  so nothing changes for the users that pass the path explicitly.
+- The path of the file in use is shown in the settings dialog, the user does
+  not have to guess which one was picked up.
+- The data directory is not moved, it stays the one of the configuration
+  file. A fully portable installation needs a `dataDir` in the local
+  configuration file, the value is written to it the first time the file is
+  saved.

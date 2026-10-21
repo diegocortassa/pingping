@@ -44,6 +44,13 @@ directory of the operating system:
 | macOS | `~/Library/Application Support/superping/config.json` | `~/Library/Application Support/superping/data/logs` |
 | Windows | `%AppData%\superping\config.json` | `%AppData%\superping\data\logs` |
 
+A `config.json` in the folder the program is started from replaces the one of
+the user configuration directory, the two setups are then independent. It
+makes a portable installation possible, copy the configuration file next to
+the binary and the program uses it. The path of the file in use is shown in
+`SuperPinger -> Settings`. The `-config` flag has the priority over both of
+them.
+
 ## Usage
 
 Start the application and add the addresses you want to watch with the `Add`

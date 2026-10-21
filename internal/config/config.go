@@ -24,6 +24,9 @@ const (
 	DefaultLogDays     = 30
 )
 
+// FileName is the name of the configuration file.
+const FileName = "config.json"
+
 // ICMode selects how ICMP sockets are opened.
 type ICMode string
 
@@ -128,6 +131,23 @@ func DefaultPath() string {
 		return "superping.json"
 	}
 	return filepath.Join(dir, "superping", "config.json")
+}
+
+// ResolvePath returns the path of the configuration file to use. An explicit
+// path always wins. A configuration file in the working directory is used
+// when it is there, it makes the portable mode possible. The default
+// location is used otherwise.
+func ResolvePath(explicit string) string {
+	if explicit != "" {
+		return explicit
+	}
+	if info, err := os.Stat(FileName); err == nil && info.Mode().IsRegular() {
+		if abs, err := filepath.Abs(FileName); err == nil {
+			return abs
+		}
+		return FileName
+	}
+	return DefaultPath()
 }
 
 // DefaultDataDir returns the default directory for the persistent data.
