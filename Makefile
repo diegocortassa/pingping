@@ -28,7 +28,7 @@ windows-resource:
 		--icon assets/icons/icon.png \
 		--product-version $(PKGVER).0 \
 		--file-version $(PKGVER).0 \
-		--file-description "Portable network monitoring tool with real time ping graphs" \
+		--file-description "PingPing network monitor" \
 		--product-name "PingPing" \
 		--copyright "Copyright (c) Diego Cortassa" \
 		--original-filename "$(BINARY).exe" \
@@ -82,7 +82,7 @@ deb: build
 	cp $(DIST)/$(BINARY) $(DIST)/deb/usr/bin/$(BINARY)
 	cp assets/icons/icon.png $(DIST)/deb/usr/share/icons/hicolor/512x512/apps/$(BINARY).png
 	cp README.md $(DIST)/deb/usr/share/doc/$(BINARY)/README.md
-	@printf 'Package: %s\nVersion: %s\nSection: net\nPriority: optional\nArchitecture: %s\nMaintainer: PingPing <pingping@example.com>\nDescription: Portable network monitoring tool\n Real time ping monitoring with graphs and daily rotated logs.\n' \
+	@printf 'Package: %s\nVersion: %s\nSection: net\nPriority: optional\nArchitecture: %s\nMaintainer: PingPing <pingping@example.com>\nDescription: Network monitoring tool\n Real time ping monitoring with graphs and daily rotated logs.\n' \
 		"$(BINARY)" "$(PKGVER)" "$$(dpkg --print-architecture)" > $(DIST)/deb/DEBIAN/control
 	dpkg-deb --build $(DIST)/deb $(DIST)/$(BINARY)_$(PKGVER)_amd64.deb
 	@echo "built $(DIST)/$(BINARY)_$(PKGVER)_amd64.deb"
@@ -93,7 +93,7 @@ rpm: build
 	@mkdir -p $(DIST)/rpm/SPECS $(DIST)/rpm/SOURCES $(DIST)/rpm/Build $(DIST)/rpm/RPMS $(DIST)/rpm/SRPMS
 	cp $(DIST)/$(BINARY) $(DIST)/rpm/BUILDROOT/usr/bin/$(BINARY)
 	cp assets/icons/icon.png $(DIST)/rpm/BUILDROOT/usr/share/icons/hicolor/512x512/apps/$(BINARY).png
-	@printf 'Name: %s\nVersion: %s\nRelease: 1\nSummary: Portable network monitoring tool\nLicense: BSD-3-Clause\nBuildArch: x86_64\nRequires: glibc\n%%description\nReal time ping monitoring with graphs and daily rotated logs.\n' \
+	@printf 'Name: %s\nVersion: %s\nRelease: 1\nSummary: PingPing network monitor\nLicense: BSD-3-Clause\nBuildArch: x86_64\nRequires: glibc\n%%description\nReal time ping monitoring with graphs and daily rotated logs.\n' \
 		"$(BINARY)" "$(PKGVER)" > $(DIST)/rpm/SPECS/$(BINARY).spec
 	rpmbuild --define "_topdir $(CURDIR)/$(DIST)/rpm" -bb $(DIST)/rpm/SPECS/$(BINARY).spec
 	@echo "built $(DIST)/rpm/RPMS/x86_64/$(BINARY)-$(PKGVER)-1.x86_64.rpm"

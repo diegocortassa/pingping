@@ -9,7 +9,7 @@ const (
 	Author = "Diego Cortassa"
 
 	// Description is a short description of the application.
-	Description = "Portable network monitor with real time ping graphs and daily rotated logs."
+	Description = "PingPing network monitor"
 )
 
 // Version is the semantic version of the application, the build sets it.

@@ -1,4 +1,4 @@
-// Command pingping is a portable network monitoring tool. It pings the
+// Command pingping is a network monitoring tool. It pings the
 // configured addresses, shows the round trip time in real time and keeps a
 // daily rotated log of every probe.
 package main
