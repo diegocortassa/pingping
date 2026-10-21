@@ -21,11 +21,14 @@
 - [x] Actionable error for the blocked unprivileged ICMP socket on Linux, the
       root cause is reported and the `ping_group_range` command is shown in
       the interface and in the log.
+- [x] `superping -diagnose` command that opens both ICMP sockets and reports
+      the group range, the capabilities of the process and the fix.
 
 ## Doing
 
 - [ ] Verify the `net.ipv4.ping_group_range` hint on a desktop Linux with a
-      normal user (the container has a read only `/proc/sys`).
+      normal user (the container has a read only `/proc/sys` and drops
+      `CAP_NET_RAW`, even the system `ping` fails there).
 
 - [ ] Final end to end verification on a real desktop session. The application
       was verified headless with Xvfb: the window is created, the probes run,
