@@ -107,6 +107,10 @@ above is complete for the initial version.
 ## 6. Build and packaging
 
 - `make build` - compile the binary into `dist/` for the host platform.
+- `make build-windows` - cross compile the Windows executable into `dist/`.
+- `make windows-resource` - write the icon, the version information and the
+  manifest into `rsrc_windows_amd64.syso`, the linker embeds it into the
+  Windows executable.
 - `make test` - run the unit tests.
 - `make audit` - `go mod tidy -diff`, `go mod verify`, `gofmt`, `go vet`,
   `staticcheck`, `govulncheck`.

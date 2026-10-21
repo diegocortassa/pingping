@@ -23,6 +23,8 @@
       the interface and in the log.
 - [x] `superping -diagnose` command that opens both ICMP sockets and reports
       the group range, the capabilities of the process and the fix.
+- [x] Windows executable with the application icon and the version information
+      of the file properties, embedded with go-winres.
 
 ## Doing
 
