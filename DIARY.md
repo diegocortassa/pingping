@@ -297,3 +297,17 @@
 
 - The labels are now calculated from right to left, the right edge shows
   "now" and the left edge shows "oldest - window".
+
+## 2026-10-21 - Sliding time axis
+
+### Observations
+
+- After fixing the labels, they stayed in the same positions even as time
+  passed. The user expects the time axis to slide to the right in sync with
+  the graph, like a real time plot.
+
+### Decisions
+
+- The chart refreshes every second on its own ticker, updating both the axis
+  labels and the raster. The labels are computed from "now", so they slide
+  continuously as time passes.

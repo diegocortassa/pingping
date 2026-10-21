@@ -52,6 +52,16 @@ func NewChart() *Chart {
 	c.raster = canvas.NewRaster(c.render)
 	c.ExtendBaseWidget(c)
 	c.updateTheme()
+
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for range ticker.C {
+			fyne.Do(func() {
+				c.Refresh()
+			})
+		}
+	}()
 	return c
 }
 
