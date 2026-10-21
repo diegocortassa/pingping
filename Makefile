@@ -25,7 +25,6 @@ windows-resource:
 	$(GOBIN)/go-winres simply \
 		--arch amd64 \
 		--manifest gui \
-		--admin \
 		--icon assets/icons/icon.png \
 		--product-version $(WINVER).0 \
 		--file-version $(WINVER).0 \
