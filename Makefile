@@ -3,10 +3,12 @@ VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.1
 DIST     := dist
 PKG      := github.com/superping/superping
 LDFLAGS  := -s -w -X $(PKG)/internal/appinfo.Version=$(VERSION)
+WINFLAGS := $(LDFLAGS) -H=windowsgui
 GOFLAGS  := -trimpath
 GOBIN    := $(shell go env GOPATH)/bin
+WIN_CC   ?= x86_64-w64-mingw32-gcc
 
-.PHONY: all build test audit run clean icons install-tools deb rpm
+.PHONY: all build build-windows test audit run clean icons install-tools deb rpm
 
 all: build
 
@@ -15,6 +17,13 @@ build:
 	@mkdir -p $(DIST)
 	CGO_ENABLED=1 go build $(GOFLAGS) -ldflags '$(LDFLAGS)' -o $(DIST)/$(BINARY) .
 	@echo "built $(DIST)/$(BINARY) $(VERSION)"
+
+## build-windows: cross compile the Windows executable into $(DIST)
+build-windows:
+	@mkdir -p $(DIST)
+	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=$(WIN_CC) \
+		go build $(GOFLAGS) -ldflags '$(WINFLAGS)' -o $(DIST)/$(BINARY).exe .
+	@echo "built $(DIST)/$(BINARY).exe $(VERSION)"
 
 ## test: run the unit tests
 test:

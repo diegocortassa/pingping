@@ -245,6 +245,30 @@ tags, it can be overridden:
 make build VERSION=0.2.0
 ```
 
+### Cross compilation
+
+The Windows executable is built from Linux with the mingw cross compiler:
+
+```bash
+sudo apt-get install gcc-mingw-w64-x86-64
+
+make build-windows
+```
+
+It is written to `dist/superping.exe`. Fyne needs cgo for the graphics
+libraries, so the cross compiler and `CGO_ENABLED=1` are mandatory, Go turns
+cgo off by itself when the target platform differs from the host. The binary
+is linked against the Windows GUI subsystem, so it does not open a console
+window.
+
+The compiler can be changed with `WIN_CC`:
+
+```bash
+make build-windows WIN_CC=x86_64-w64-mingw32-gcc
+```
+
+A macOS build needs the macOS SDK, so it has to be compiled on a Mac.
+
 ### Test
 
 ```bash

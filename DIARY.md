@@ -177,3 +177,25 @@
   settings stay in the `SuperPinger` menu.
 - The application keeps a reference to the toolbar, a test pins the buttons of
   the toolbar and checks that the settings are still in the menu.
+
+## 2026-10-21 - Windows build
+
+### Observations
+
+- The Windows executable was built with a command typed by hand, the knowledge
+  was not in the repository, so every release had to rediscover it.
+- Fyne needs cgo, so the cross compiler is mandatory. Go turns cgo off by
+  itself when the target platform differs from the host, the build has to set
+  `CGO_ENABLED=1` explicitly. The Fyne build tool does the same, see
+  https://docs.fyne.io/started/cross-compiling
+- A console subsystem binary opens a black console window next to the
+  interface, the Fyne build tool links the Windows binaries against the GUI
+  subsystem with `-H=windowsgui`.
+
+### Decisions
+
+- The Makefile has a `build-windows` target, it cross compiles the executable
+  with `CGO_ENABLED=1 GOOS=windows GOARCH=amd64` and the mingw compiler. The
+  compiler can be overridden with `WIN_CC`.
+- The Windows binary is linked with `-H=windowsgui`, so it does not open a
+  console window.
