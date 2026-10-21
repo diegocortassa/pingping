@@ -228,6 +228,7 @@ func (m *Monitor) loop(ctx context.Context, t config.Target, mode config.ICMode)
 				Time:     result.Time,
 				RTT:      result.RTT,
 				Success:  result.Success,
+				Offline:  result.Offline,
 				Error:    result.Err,
 			})
 		}

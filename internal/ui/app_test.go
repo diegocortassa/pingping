@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -86,6 +87,20 @@ func TestAppStatusText(t *testing.T) {
 
 	if got := statusText(app.rows[0], hist.Stats("t1")); got != "up" {
 		t.Fatalf("got %q, want up", got)
+	}
+}
+
+func TestAppShowsTheErrorOfATarget(t *testing.T) {
+	app, hist := newTestApp(t, target("t1", "1.1.1.1"))
+
+	hist.Add(model.Sample{TargetID: "t1", Time: time.Now(), Offline: true, Error: "socket: permission denied"})
+	app.onSample(model.Sample{TargetID: "t1", Time: time.Now(), Offline: true, Error: "socket: permission denied"})
+
+	if got := statusText(app.rows[0], hist.Stats("t1")); got != "error" {
+		t.Fatalf("got status %q, want error", got)
+	}
+	if got := app.labels["t1"].Text; !strings.Contains(got, "socket: permission denied") {
+		t.Fatalf("the error is missing in %q", got)
 	}
 }
 

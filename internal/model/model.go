@@ -16,6 +16,9 @@ type Sample struct {
 	RTT time.Duration `json:"-"`
 	// Success tells whether the host answered in time.
 	Success bool `json:"success"`
+	// Offline tells whether the probe could not be sent at all, for example
+	// because the ICMP socket could not be opened.
+	Offline bool `json:"offline,omitempty"`
 	// Error describes why the probe failed.
 	Error string `json:"error,omitempty"`
 }

@@ -28,6 +28,11 @@ type Stats struct {
 	LastAt time.Time
 	// LastOK tells whether the most recent probe succeeded.
 	LastOK bool
+	// LastError is the error of the most recent probe, empty when it worked.
+	LastError string
+	// LastOffline tells whether the most recent probe could not be sent at
+	// all, for example because the ICMP socket could not be opened.
+	LastOffline bool
 	// Min, Avg and Max are the round trip times of the successful probes.
 	Min, Avg, Max time.Duration
 	// Jitter is the mean absolute difference between consecutive round trip
@@ -157,6 +162,8 @@ func statsOf(samples []model.Sample) Stats {
 	st.Last = last.RTT
 	st.LastAt = last.Time
 	st.LastOK = last.Success
+	st.LastError = last.Error
+	st.LastOffline = last.Offline
 
 	var sum, jitter time.Duration
 	var prev time.Duration

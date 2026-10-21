@@ -18,8 +18,14 @@
 - [x] `DIARY.md` log of the work.
 - [x] Dependency updates: `golang.org/x/image` v0.43.0, Go 1.27.3 for the
       `crypto/x509` advisory, `govulncheck` reports no findings.
+- [x] Actionable error for the blocked unprivileged ICMP socket on Linux, the
+      root cause is reported and the `ping_group_range` command is shown in
+      the interface and in the log.
 
 ## Doing
+
+- [ ] Verify the `net.ipv4.ping_group_range` hint on a desktop Linux with a
+      normal user (the container has a read only `/proc/sys`).
 
 - [ ] Final end to end verification on a real desktop session. The application
       was verified headless with Xvfb: the window is created, the probes run,

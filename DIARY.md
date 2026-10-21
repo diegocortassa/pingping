@@ -78,3 +78,33 @@
   forever. The bug was found while testing the fallback with a fake session.
 - Durations are written in a compact form (`1h`, `1m30s`) instead of the Go
   default (`1h0m0s`), the output is still valid for `time.ParseDuration`.
+
+## 2026-10-21 - Linux unprivileged ICMP
+
+### Observations
+
+- A normal user on Linux got `socket: permission denied` with the
+  unprivileged mode and `listen ip4:icmp : socket: operation not permitted`
+  with the privileged one. The kernel restricts the ICMP_PROTO datagram
+  sockets to the groups listed in `net.ipv4.ping_group_range`, which is empty
+  by default, and the raw socket needs `CAP_NET_RAW`.
+  See https://www.kernel.org/doc/html/latest/networking/ip-sysctl.html
+- The fix is `sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"`, the
+  same value Debian and Ubuntu ship in `/usr/lib/sysctl.d/iputils-ping.conf`.
+- Reproduced in the container with the `ubuntu` user (uid 1000) and the range
+  `0 0`: the unprivileged socket fails with `EACCES` and the privileged one
+  with `EPERM`, exactly as reported.
+- The `auto` mode reported the error of the last attempt, the privileged one,
+  which hides the root cause. The unprivileged error is the one the user can
+  act on.
+
+### Decisions
+
+- The error of a session that could not be started now carries a hint with the
+  exact command, the hint is built per platform in
+  `internal/ping/privilege_linux.go` and `internal/ping/privilege_other.go`.
+- The `auto` mode reports the unprivileged error as the root cause and adds
+  the error of the privileged fallback as a remark.
+- The samples carry an `offline` flag, it tells the interface that the probe
+  was never sent, so the status column reads `error` instead of `down` and the
+  reason is shown below the graph.

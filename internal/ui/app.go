@@ -171,6 +171,7 @@ func (a *App) rebuild() {
 		chart.SetSamples(a.hist.Samples(t.ID), a.cfg.GraphWindow.Duration())
 
 		label := widget.NewLabel(a.statsText(t.ID))
+		label.Wrapping = fyne.TextWrapWord
 		a.charts[t.ID] = chart
 		a.labels[t.ID] = label
 
@@ -239,9 +240,14 @@ func (a *App) statsText(targetID string) string {
 	if stats.Count == 0 {
 		return "Waiting for the first probe..."
 	}
-	return fmt.Sprintf("Last %s | Average %s | Min %s | Max %s | Jitter %s | Loss %.1f%% | %d probes",
+
+	summary := fmt.Sprintf("Last %s | Average %s | Min %s | Max %s | Jitter %s | Loss %.1f%% | %d probes",
 		rttText(stats), avgText(stats), durationText(stats.Min), durationText(stats.Max),
 		durationText(stats.Jitter), stats.Loss, stats.Count)
+	if stats.LastError != "" {
+		summary += " | Error: " + stats.LastError
+	}
+	return summary
 }
 
 // updateStatus refreshes the status bar.
@@ -263,6 +269,9 @@ func statusText(target config.Target, stats history.Stats) string {
 	}
 	if stats.LastOK {
 		return "up"
+	}
+	if stats.LastOffline {
+		return "error"
 	}
 	return "down"
 }

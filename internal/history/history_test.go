@@ -123,6 +123,20 @@ func TestStatsWithASingleFailure(t *testing.T) {
 	}
 }
 
+func TestStatsKeepsTheLastError(t *testing.T) {
+	h := New(time.Hour)
+	h.Add(sample(time.Now(), 0, false))
+	h.Add(model.Sample{TargetID: "t1", Time: time.Now(), Offline: true, Error: "socket: permission denied"})
+
+	stats := h.Stats("t1")
+	if stats.LastError != "socket: permission denied" {
+		t.Fatalf("got error %q", stats.LastError)
+	}
+	if !stats.LastOffline {
+		t.Fatal("expected the last probe to be offline")
+	}
+}
+
 func TestForget(t *testing.T) {
 	h := New(time.Hour)
 	h.Add(sample(time.Now(), time.Millisecond, true))

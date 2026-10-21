@@ -84,6 +84,36 @@ Use the tray menu to show the window again or to quit.
 On Windows the ICMP sockets need an elevated process, the `auto` mode picks the
 working flavour by itself.
 
+### Linux and unprivileged ICMP
+
+Linux restricts the unprivileged ICMP sockets to the groups listed in
+`net.ipv4.ping_group_range`, which is empty by default. As a normal user the
+probes then fail with:
+
+```
+socket: permission denied: unprivileged ICMP is blocked, allow it with:
+sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+```
+
+The fix is one command, run it once as root:
+
+```bash
+sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+```
+
+To make it permanent, create `/etc/sysctl.d/99-superping.conf` with:
+
+```
+net.ipv4.ping_group_range = 0 2147483647
+```
+
+and run `sudo sysctl --system`.
+
+The same error is shown in the interface: the status column of the target
+reads `error` and the line below the graph holds the reason. Without the
+sysctl the only other option is to run SuperPinger as root or to grant it the
+`CAP_NET_RAW` capability.
+
 ### Command line
 
 ```

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -73,6 +74,64 @@ func TestFallsBackToThePrivilegedSocket(t *testing.T) {
 	defer mu.Unlock()
 	if len(attempts) != 2 || attempts[0] || !attempts[1] {
 		t.Fatalf("got attempts %v, want [false true]", attempts)
+	}
+}
+
+func TestAutoModeReportsTheRootCause(t *testing.T) {
+	factory := func(cfg proberConfig) prober {
+		if !cfg.privileged {
+			return fakeProber{cfg: cfg, err: errors.New("socket: permission denied")}
+		}
+		return fakeProber{cfg: cfg, err: errors.New("listen ip4:icmp : socket: operation not permitted")}
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	results := newTestPinger(config.ICModeAuto, factory).Run(ctx)
+
+	select {
+	case result := <-results:
+		if result.Success {
+			t.Fatal("expected a failed result")
+		}
+		if !result.Offline {
+			t.Fatal("expected an offline result")
+		}
+		if !strings.Contains(result.Err, "socket: permission denied") {
+			t.Fatalf("the root cause is missing in %q", result.Err)
+		}
+		if strings.Contains(result.Err, "operation not permitted") == false {
+			t.Fatalf("the fallback error is missing in %q", result.Err)
+		}
+		if !strings.Contains(result.Err, "ping_group_range") && !strings.Contains(result.Err, "CAP_NET_RAW") {
+			t.Fatalf("the hint is missing in %q", result.Err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for a result")
+	}
+}
+
+func TestUnprivilegedModeReportsTheHint(t *testing.T) {
+	factory := func(cfg proberConfig) prober {
+		return fakeProber{cfg: cfg, err: errors.New("socket: permission denied")}
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	results := newTestPinger(config.ICModeUnprivileged, factory).Run(ctx)
+
+	select {
+	case result := <-results:
+		if !result.Offline {
+			t.Fatal("expected an offline result")
+		}
+		if !strings.Contains(result.Err, "socket: permission denied") {
+			t.Fatalf("the cause is missing in %q", result.Err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for a result")
 	}
 }
 

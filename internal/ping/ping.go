@@ -27,6 +27,9 @@ type Result struct {
 	RTT time.Duration
 	// Success tells whether the host answered in time.
 	Success bool
+	// Offline tells whether the probe could not be sent at all, for example
+	// because the ICMP socket could not be opened.
+	Offline bool
 	// Err describes why the probe failed.
 	Err string
 }
@@ -104,7 +107,9 @@ func (p *Pinger) Run(ctx context.Context) <-chan Result {
 func (p *Pinger) loop(ctx context.Context, out chan<- Result) {
 	defer close(out)
 
-	for i, privileged := range p.attempts() {
+	attempts := p.attempts()
+	var firstErr error
+	for i, privileged := range attempts {
 		err := p.probe(ctx, privileged, out)
 		if ctx.Err() != nil {
 			return
@@ -112,11 +117,36 @@ func (p *Pinger) loop(ctx context.Context, out chan<- Result) {
 		if err == nil {
 			return
 		}
-		if i == len(p.attempts())-1 || !isPermissionError(err) {
-			p.emit(ctx, out, Result{Time: time.Now(), Err: err.Error()})
+		if firstErr == nil {
+			firstErr = err
+		}
+		if i == len(attempts)-1 || !isPermissionError(err) {
+			p.emit(ctx, out, Result{
+				Time:    time.Now(),
+				Offline: true,
+				Err:     describeError(firstErr, err, len(attempts)),
+			})
 			return
 		}
 	}
+}
+
+// describeError builds the message of a session that could not be started.
+//
+// The unprivileged socket is tried first, so its error is the root cause and
+// the one the user can act on. The error of the privileged fallback is only
+// added as a remark.
+func describeError(first, last error, attempts int) string {
+	if attempts == 1 || first == nil || !isPermissionError(first) {
+		return last.Error()
+	}
+
+	message := first.Error()
+	if hint := privilegeHint(); hint != "" {
+		message += ": " + hint
+	}
+	message += " (the privileged fallback failed too: " + last.Error() + ")"
+	return message
 }
 
 // attempts returns the socket flavours to try, in order.
