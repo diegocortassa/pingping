@@ -77,7 +77,8 @@ The add and edit dialog takes four fields:
 Selecting a row of the table shows the graph of that target. The summary line
 below the graph holds the statistics of the visible window.
 
-The `Settings` item of the `PingPing` menu opens the application settings:
+The graph window can be changed with the `Graph` menu or in the settings, the
+`Settings` item of the `PingPing` menu opens them:
 
 | Setting | Description |
 | ------- | ----------- |
@@ -89,11 +90,12 @@ The `Settings` item of the `PingPing` menu opens the application settings:
 Closing the window hides it, the program keeps monitoring in the system tray.
 Use the tray menu to show the window again or to quit.
 
-The menu bar holds two menus:
+The menu bar holds three menus:
 
 | Menu | Items |
 | ---- | ----- |
 | `PingPing` | Add target, Settings, Quit. |
+| `Graph` | The length of the graph window, from 15 minutes to 24 hours, the current one is checked. |
 | `Help` | About, it shows the icon, the name, the version and the author. |
 
 ### ICMP mode

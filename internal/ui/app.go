@@ -87,7 +87,7 @@ func (a *App) setup(fyneApp fyne.App) {
 	a.win = a.fyneApp.NewWindow("PingPing")
 	a.win.SetIcon(icons.App())
 	a.win.Resize(fyne.NewSize(1020, 640))
-	a.win.SetMainMenu(fyne.NewMainMenu(a.mainMenu(), a.helpMenu()))
+	a.refreshMenu()
 	a.win.SetCloseIntercept(func() { a.win.Hide() })
 
 	a.buildContent()
@@ -110,6 +110,29 @@ func (a *App) mainMenu() *fyne.Menu {
 		fyne.NewMenuItem("Settings", a.showSettings),
 		fyne.NewMenuItem("Quit", func() { a.fyneApp.Quit() }),
 	)
+}
+
+// graphMenu returns the menu that changes the length of the graph window.
+func (a *App) graphMenu() *fyne.Menu {
+	items := make([]*fyne.MenuItem, 0, len(graphWindowOptions))
+	for _, option := range graphWindowOptions {
+		value := option.Value
+		item := fyne.NewMenuItem(option.Label, func() { a.setGraphWindow(value) })
+		item.Checked = a.cfg.GraphWindow.Duration() == value
+		items = append(items, item)
+	}
+	return fyne.NewMenu("Graph", items...)
+}
+
+// setGraphWindow changes the length of the graph window.
+func (a *App) setGraphWindow(value time.Duration) {
+	if a.cfg.GraphWindow.Duration() == value {
+		return
+	}
+	a.cfg.GraphWindow = config.Duration(value)
+	a.hist.SetWindow(value)
+	a.saveConfig()
+	a.rebuild()
 }
 
 // helpMenu returns the help menu of the window.
@@ -166,6 +189,7 @@ func (a *App) buildContent() {
 
 // rebuild refreshes the target list and the charts.
 func (a *App) rebuild() {
+	a.refreshMenu()
 	a.rows = a.cfg.Targets
 	a.selectedRow = 0
 
@@ -255,6 +279,11 @@ func (a *App) statsText(targetID string) string {
 		summary += " | Error: " + stats.LastError
 	}
 	return summary
+}
+
+// refreshMenu rebuilds the menu bar so the check marks follow the settings.
+func (a *App) refreshMenu() {
+	a.win.SetMainMenu(fyne.NewMainMenu(a.mainMenu(), a.graphMenu(), a.helpMenu()))
 }
 
 // updateStatus refreshes the status bar.

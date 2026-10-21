@@ -348,3 +348,18 @@
   column tells their records apart.
 - The writer keeps one open file per target, the status bar shows the log
   directory because there is no single file anymore.
+
+## 2026-10-21 - Graph window menu
+
+### Observations
+
+- The length of the graph window could only be changed through the settings
+  dialog, even though it is the setting changed most often.
+
+### Decisions
+
+- Added a `Graph` menu between `PingPing` and `Help` with one radio item per
+  selectable length, the current one is checked.
+- The menu is rebuilt on every rebuild so the check mark follows the value
+  changed in the settings as well.
+- Both paths write the configuration, so the choice survives a restart.
