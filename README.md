@@ -44,10 +44,6 @@ directory of the operating system:
 | macOS | `~/Library/Application Support/pingping/config.json` | `~/Library/Application Support/pingping/data/logs` |
 | Windows | `%AppData%\pingping\config.json` | `%AppData%\pingping\data\logs` |
 
-The application was called SuperPinger before, the configuration and the
-logs of the old versions are in the `superping` directory, they have to be
-moved by hand.
-
 A `config.json` in the folder the program is started from replaces the one of
 the user configuration directory, the two setups are then independent. It
 makes a portable installation possible, copy the configuration file next to
