@@ -284,3 +284,16 @@
   drop samples anymore, so expanding it again shows the previous data.
 - The pruning is only done by the time of reading, and the safety cap is
   still enforced when a sample is added.
+
+## 2026-10-21 - Graph time axis direction
+
+### Observations
+
+- The time axis labels went from now on the left to the oldest on the right,
+  but the data was plotted with old samples on the left and new samples on
+  the right. The labels were inverted relative to the data.
+
+### Decisions
+
+- The labels are now calculated from right to left, the right edge shows
+  "now" and the left edge shows "oldest - window".

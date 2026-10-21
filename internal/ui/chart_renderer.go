@@ -114,7 +114,7 @@ func (r *chartRenderer) updateLabels() {
 	now := time.Now()
 	for i, label := range r.xLabels {
 		fraction := float64(i) / float64(chartGridLines)
-		label.Text = now.Add(-time.Duration(fraction * float64(window))).Format("15:04")
+		label.Text = now.Add(-time.Duration((1 - fraction) * float64(window))).Format("15:04")
 	}
 }
 
