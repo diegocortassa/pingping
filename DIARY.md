@@ -416,3 +416,11 @@
   `Resize`; the open log dialog is the standard one again, sized to 80% by 90%
   of the main window. Fyne dialogs are modal popups, so they cannot be resized
   by dragging, `Resize` is the supported way to size them.
+
+## 2026-10-23 (0.5.3)
+
+- The From and To entries of the log window were tiny: the bar was an HBox and
+  the entries were laid out while still empty, so they kept the empty entry
+  width even after the range filled them. The bar is now a Border with the two
+  times in a two column grid, so they share the free width (about 330 each on
+  the default window) and grow with the window.

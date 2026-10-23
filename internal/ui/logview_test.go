@@ -177,3 +177,24 @@ func TestOpenLogDialogIsSizedToTheWindow(t *testing.T) {
 		t.Fatalf("the dialog is %v, want %v (the window is %v)", got, want, canvas)
 	}
 }
+
+func TestLogWindowGivesRoomToTheTimeFields(t *testing.T) {
+	app, _ := newTestApp(t)
+	at := time.Date(2026, 10, 21, 9, 0, 0, 0, time.UTC)
+	lw := &logWindow{
+		app:  app,
+		path: "pings-1.1.1.1-2026-10-21.csv",
+		series: groupSamples([]model.Sample{
+			sampleAt("t1", "1.1.1.1", at, time.Millisecond),
+			sampleAt("t1", "1.1.1.1", at.Add(time.Minute), time.Millisecond),
+		}),
+	}
+	lw.show()
+
+	if lw.from.Size().Width < 200 {
+		t.Fatalf("the from field is %v wide", lw.from.Size())
+	}
+	if lw.to.Size().Width < 200 {
+		t.Fatalf("the to field is %v wide", lw.to.Size())
+	}
+}

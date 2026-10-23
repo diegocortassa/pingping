@@ -132,9 +132,11 @@ func (lw *logWindow) show() {
 		lw.resetRange(label)
 	})
 
-	bar := container.NewHBox(
-		widget.NewLabel("From"), lw.from,
-		widget.NewLabel("To"), lw.to,
+	from := container.NewBorder(nil, nil, widget.NewLabel("From"), nil, lw.from)
+	to := container.NewBorder(nil, nil, widget.NewLabel("To"), nil, lw.to)
+	times := container.NewGridWithColumns(2, from, to)
+
+	controls := container.NewHBox(
 		widget.NewButton("Apply", lw.applyRange),
 		widget.NewLabel("Range"), lw.preset,
 	)
@@ -144,9 +146,10 @@ func (lw *logWindow) show() {
 			lw.resetRange(lw.preset.Selected)
 		})
 		target.SetSelected(lw.series[0].Label)
-		bar.Add(widget.NewLabel("Target"))
-		bar.Add(target)
+		controls.Add(widget.NewLabel("Target"))
+		controls.Add(target)
 	}
+	bar := container.NewBorder(nil, nil, nil, controls, times)
 
 	lw.win.SetContent(container.NewBorder(bar, lw.summary, nil, nil, lw.chart))
 	lw.preset.SetSelected(logRangeOptions[0].Label)

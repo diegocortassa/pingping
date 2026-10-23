@@ -2,6 +2,8 @@
 
 ## Done
 
+- [x] Log window: give the From and To time fields a usable width (0.5.3).
+
 - [x] Open log: size the Fyne file dialog to the main window (0.5.2).
 
 - [x] Project skeleton, `go.mod`, dependencies (Fyne v2.8.2, pro-bing v0.9.1).
