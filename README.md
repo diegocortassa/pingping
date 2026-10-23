@@ -101,9 +101,9 @@ The menu bar holds three menus:
 ### Open a log
 
 `PingPing -> Open log...` (or `Ctrl+O`) opens an old CSV log in its own window.
-The resizable picker starts in the log folder and only shows `.csv` files, it
-also has a path field and an "All files" switch. The same window can be opened
-at startup with the `-log` flag, for example:
+The file dialog starts in the log folder, only shows `.csv` files and is sized
+to the main window. The same window can be opened at startup with the `-log`
+flag, for example:
 
 ```bash
 pingping -log ~/.local/share/pingping/logs/pings-1.1.1.1-2026-10-21.csv

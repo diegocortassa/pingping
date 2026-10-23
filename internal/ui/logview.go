@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/pingping/pingping/assets/icons"
@@ -42,6 +43,34 @@ type logSeries struct {
 	ID      string
 	Label   string
 	Samples []model.Sample
+}
+
+// openLogDialog lets the user pick a log file and opens it.
+func (a *App) openLogDialog() {
+	picker := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+		if err != nil {
+			dialog.ShowError(err, a.win)
+			return
+		}
+		if reader == nil {
+			return
+		}
+		path := reader.URI().Path()
+		if err := reader.Close(); err != nil {
+			dialog.ShowError(err, a.win)
+			return
+		}
+		if err := a.openLog(path); err != nil {
+			dialog.ShowError(err, a.win)
+		}
+	}, a.win)
+	picker.SetFilter(storage.NewExtensionFileFilter([]string{".csv"}))
+	if lister, err := storage.ListerForURI(storage.NewFileURI(a.cfg.LogDir())); err == nil {
+		picker.SetLocation(lister)
+	}
+	size := a.win.Canvas().Size()
+	picker.Resize(fyne.NewSize(size.Width*0.8, size.Height*0.9))
+	picker.Show()
 }
 
 // openLog reads a log file and shows it in a new window.

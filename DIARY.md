@@ -411,3 +411,8 @@
 - `listDir` sorts the folders first and filters the CSV files (case
   insensitive, dot files skipped); `pickerStartDir` falls back to the home
   folder when the log folder does not exist yet.
+
+- 0.5.2: the custom picker was a mistake, `dialog.FileDialog` already has
+  `Resize`; the open log dialog is the standard one again, sized to 80% by 90%
+  of the main window. Fyne dialogs are modal popups, so they cannot be resized
+  by dragging, `Resize` is the supported way to size them.

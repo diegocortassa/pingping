@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/pingping/pingping/internal/model"
@@ -158,5 +159,21 @@ func TestLogWindowAppliesTheRange(t *testing.T) {
 	}
 	if lw.summary.Text == "" {
 		t.Fatal("the summary is empty")
+	}
+}
+
+func TestOpenLogDialogIsSizedToTheWindow(t *testing.T) {
+	app, _ := newTestApp(t)
+	app.openLogDialog()
+
+	overlays := app.win.Canvas().Overlays().List()
+	if len(overlays) != 1 {
+		t.Fatalf("got %d overlays, want the file dialog", len(overlays))
+	}
+	canvas := app.win.Canvas().Size()
+	want := fyne.NewSize(canvas.Width*0.8, canvas.Height*0.9)
+	objects := overlays[0].(fyne.Widget).CreateRenderer().Objects()
+	if got := objects[len(objects)-1].Size(); got != want {
+		t.Fatalf("the dialog is %v, want %v (the window is %v)", got, want, canvas)
 	}
 }

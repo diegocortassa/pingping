@@ -2,7 +2,7 @@
 
 ## Done
 
-- [x] Open log: resizable picker window to replace the fixed Fyne file dialog.
+- [x] Open log: size the Fyne file dialog to the main window (0.5.2).
 
 - [x] Project skeleton, `go.mod`, dependencies (Fyne v2.8.2, pro-bing v0.9.1).
 - [x] `PLAN.md` with the architecture and the feature breakdown.
