@@ -86,7 +86,7 @@ func (a *App) setup(fyneApp fyne.App) {
 
 	a.win = a.fyneApp.NewWindow("PingPing")
 	a.win.SetIcon(icons.App())
-	a.win.Resize(fyne.NewSize(1020, 640))
+	a.win.Resize(fyne.NewSize(1350, 640))
 	a.refreshMenu()
 	a.win.SetCloseIntercept(func() { a.win.Hide() })
 

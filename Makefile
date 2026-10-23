@@ -61,6 +61,7 @@ run:
 ## clean: remove the build artifacts
 clean:
 	rm -rf $(DIST)
+	rm -rf rsrc_windows_amd64.syso
 
 ## icons: regenerate the PNG assets from the SVG sources
 icons:
