@@ -379,3 +379,26 @@
   Windows because the logs must not roam with the profile.
 - A relative `$XDG_DATA_HOME` is ignored, as the specification requires.
 - There is no migration, the project is still experimental.
+
+## 2026-10-21 - Open an old log
+
+### Observations
+
+- The logs could only be inspected with a spreadsheet, the application could
+  not show them even though it wrote them.
+
+### Decisions
+
+- `PingPing -> Open log...` with `Ctrl+O`, a `-log` flag for the command line
+  and the file associations, a file dialog filtered to CSV that starts in the
+  log folder.
+- The log opens in its own window so it can be compared with the live graphs.
+- The chart gained a historical mode: a fixed range with a fixed right edge
+  instead of the current time, and the date is added to the axis labels when
+  the range spans more than one day.
+- The range is chosen with two times and a list of quick ranges, the whole
+  file by default.
+- A log can hold several targets, the older format did, so the window groups
+  the samples and shows a target list when needed.
+- The statistics of a list of samples moved to `history.StatsOf` so the live
+  and the log windows share them.

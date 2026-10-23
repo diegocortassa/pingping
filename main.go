@@ -26,6 +26,7 @@ func main() {
 	var (
 		configPath  = flag.String("config", "", "path of the configuration file")
 		dataDir     = flag.String("data-dir", "", "directory of the persistent data")
+		logPath     = flag.String("log", "", "open a log file in a graph window at startup")
 		showVersion = flag.Bool("version", false, "print the version and exit")
 		diagnose    = flag.Bool("diagnose", false, "report the ICMP capabilities of the system and exit")
 	)
@@ -84,5 +85,6 @@ func main() {
 	defer mon.Stop()
 
 	application := ui.New(&cfg, path, mon, hist, store)
+	application.SetStartupLog(*logPath)
 	application.Run()
 }

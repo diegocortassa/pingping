@@ -30,6 +30,7 @@
 - [x] One CSV log file per target, rotated every 24 hours.
 - [x] `Graph` menu to change the graph window without opening the settings.
 - [x] Store the logs in `$XDG_DATA_HOME` instead of the configuration directory.
+- [x] Open an old CSV log in a graph window, with a range picker and a `-log` flag.
 
 ## Doing
 

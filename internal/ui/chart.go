@@ -32,6 +32,7 @@ type Chart struct {
 	mu      sync.RWMutex
 	samples []model.Sample
 	window  time.Duration
+	end     time.Time
 	maxRTT  time.Duration
 	colors  chartColors
 
@@ -58,29 +59,74 @@ func NewChart() *Chart {
 		defer ticker.Stop()
 		for range ticker.C {
 			fyne.Do(func() {
-				c.Refresh()
+				if c.isLive() {
+					c.Refresh()
+				}
 			})
 		}
 	}()
 	return c
 }
 
-// SetSamples replaces the plotted data.
+// SetSamples replaces the plotted data. The chart is anchored to the current
+// time, it is the live mode.
 func (c *Chart) SetSamples(samples []model.Sample, window time.Duration) {
 	c.mu.Lock()
 	c.samples = samples
+	c.end = time.Time{}
 	if window > 0 {
 		c.window = window
 	}
-	c.maxRTT = 0
-	for _, s := range samples {
-		if s.Success && s.RTT > c.maxRTT {
-			c.maxRTT = s.RTT
-		}
-	}
+	c.maxRTT = maxRTT(samples)
 	c.mu.Unlock()
 
 	c.Refresh()
+}
+
+// SetRange replaces the plotted data and anchors the chart to a fixed time
+// range, it is the historical mode.
+func (c *Chart) SetRange(samples []model.Sample, start, end time.Time) {
+	if !end.After(start) {
+		end = start.Add(time.Second)
+	}
+	c.mu.Lock()
+	c.samples = samples
+	c.window = end.Sub(start)
+	c.end = end
+	c.maxRTT = maxRTT(samples)
+	c.mu.Unlock()
+
+	c.Refresh()
+}
+
+// isLive tells whether the chart follows the current time.
+func (c *Chart) isLive() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.end.IsZero()
+}
+
+// bounds returns the start and the end of the plotted range.
+func (c *Chart) bounds() (time.Time, time.Time) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	end := c.end
+	if end.IsZero() {
+		end = time.Now()
+	}
+	return end.Add(-c.window), end
+}
+
+// maxRTT returns the highest round trip time of the successful samples.
+func maxRTT(samples []model.Sample) time.Duration {
+	var highest time.Duration
+	for _, s := range samples {
+		if s.Success && s.RTT > highest {
+			highest = s.RTT
+		}
+	}
+	return highest
 }
 
 // CreateRenderer implements fyne.Widget.
@@ -119,7 +165,8 @@ func (c *Chart) render(w, h int) image.Image {
 	c.mu.RLock()
 	samples := c.samples
 	window := c.window
-	maxRTT := c.maxRTT
+	end := c.end
+	highest := c.maxRTT
 	colors := c.colors
 	c.mu.RUnlock()
 
@@ -131,12 +178,15 @@ func (c *Chart) render(w, h int) image.Image {
 		drawVLine(img, x, 0, h, colors.grid)
 	}
 
-	scale := niceMax(float64(maxRTT) / float64(time.Millisecond))
+	scale := niceMax(float64(highest) / float64(time.Millisecond))
 	if len(samples) == 0 || scale <= 0 {
 		return img
 	}
 
 	start := time.Now().Add(-window)
+	if !end.IsZero() {
+		start = end.Add(-window)
+	}
 	buckets := bucketSamples(samples, start, window, w, scale)
 
 	prevX, prevY := -1, -1

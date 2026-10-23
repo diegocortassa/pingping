@@ -94,9 +94,26 @@ The menu bar holds three menus:
 
 | Menu | Items |
 | ---- | ----- |
-| `PingPing` | Add target, Settings, Quit. |
+| `PingPing` | Add target, Open log..., Settings, Quit. |
 | `Graph` | The length of the graph window, from 15 minutes to 24 hours, the current one is checked. |
 | `Help` | About, it shows the icon, the name, the version and the author. |
+
+### Open a log
+
+`PingPing -> Open log...` (or `Ctrl+O`) opens an old CSV log in its own window,
+the file picker starts in the log folder and only shows `.csv` files. The same
+window can be opened at startup with the `-log` flag, for example:
+
+```bash
+pingping -log ~/.local/share/pingping/logs/pings-1.1.1.1-2026-10-21.csv
+```
+
+The window shows the graph of the file with a summary line. The `From` and `To`
+fields take a `2026-10-21 09:00:00` time, `Apply` redraws the graph for that
+range and the `Range` list offers the whole file or the last 15 minutes, hour,
+6 hours and 24 hours. A file that holds more than one target, as the logs of
+the older versions do, gets a `Target` list above the graph. The axis shows the
+times of the file, not the current time.
 
 ### ICMP mode
 
@@ -194,6 +211,8 @@ Usage of pingping:
         directory of the persistent data
   -diagnose
         report the ICMP capabilities of the system and exit
+  -log string
+        open a log file in a graph window at startup
   -version
         print the version and exit
 ```

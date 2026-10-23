@@ -44,8 +44,8 @@ internal/config             Config/Target model, JSON (de)serialisation, default
 internal/ping               ICMP pinger wrapper, privilege fallback, timeout tracking
 internal/monitor            owns targets, drives pings, publishes samples to subscribers
 internal/history            rolling per target sample buffer + statistics
-internal/logstore           daily rotated CSV writer, one file per target
-internal/ui                 Fyne window, tray, target table, dialogs, chart widget
+internal/logstore           daily rotated CSV writer, one file per target, reader
+internal/ui                 Fyne windows, tray, target table, dialogs, chart widget, log viewer
 internal/ui/chart           custom real time line chart widget
 assets/                     SVG sources
 assets/icons/               generated PNG assets (embedded)
@@ -81,7 +81,14 @@ All Fyne widget updates are funnelled through `fyne.Do`.
 - Gaps in the line mark packet loss, red markers mark failed probes.
 - Data is downsampled to at most one bucket per pixel column.
 
-### 4.4 Logging
+### 4.4 Reading the logs
+- `PingPing -> Open log...` (`Ctrl+O`) and the `-log` flag open a CSV log in its
+  own window, next to the live dashboard.
+- The window plots the file with a fixed time range; `From`/`To` and a list of
+  quick ranges select the part to show.
+- Files that hold more than one target get a target list.
+
+### 4.5 Logging
 - `<dataDir>/logs/pings-<address>-YYYY-MM-DD.csv` with header
   `timestamp,target_id,address,rtt_ms,success,error` (snake_case, as the
   project conventions require for stored records).
@@ -89,12 +96,12 @@ All Fyne widget updates are funnelled through `fyne.Do`.
 - New file every calendar day (24h rotation).
 - Old files pruned after the configured retention (default 30 days, 0 keeps all).
 
-### 4.5 Tray behaviour
+### 4.6 Tray behaviour
 - Closing the window hides it, monitoring continues.
 - Tray menu: Show, Hide, Quit.
 - Left click on the tray icon brings the window back.
 
-### 4.6 Settings
+### 4.7 Settings
 - Graph window (15m, 30m, 1h, 2h, 6h, 24h).
 - Log retention in days.
 - Force privileged ICMP mode.

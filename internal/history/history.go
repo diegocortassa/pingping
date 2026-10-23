@@ -136,7 +136,7 @@ func (h *History) Stats(targetID string) Stats {
 			out = append(out, s)
 		}
 	}
-	return statsOf(out)
+	return StatsOf(out)
 }
 
 // Targets returns the identifiers that have samples.
@@ -159,8 +159,8 @@ func (h *History) Forget(targetID string) {
 	delete(h.series, targetID)
 }
 
-// statsOf computes the statistics of a list of samples.
-func statsOf(samples []model.Sample) Stats {
+// StatsOf computes the statistics of a list of samples.
+func StatsOf(samples []model.Sample) Stats {
 	var st Stats
 	st.Count = len(samples)
 	if st.Count == 0 {

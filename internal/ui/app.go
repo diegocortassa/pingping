@@ -42,6 +42,8 @@ type App struct {
 	hist    *history.History
 	store   *logstore.Writer
 
+	startupLog string
+
 	fyneApp fyne.App
 	win     fyne.Window
 	table   *widget.Table
@@ -69,10 +71,18 @@ func New(cfg *config.Config, cfgPath string, mon *monitor.Monitor, hist *history
 	}
 }
 
+// SetStartupLog sets the log file that is opened when the interface starts.
+func (a *App) SetStartupLog(path string) {
+	a.startupLog = path
+}
+
 // Run starts the graphical user interface and blocks until the application is
 // closed.
 func (a *App) Run() {
 	a.setup(app.NewWithID("com.pingping.pingping"))
+	if a.startupLog != "" {
+		a.fyneApp.Lifecycle().SetOnStarted(a.openStartupLog)
+	}
 	a.win.ShowAndRun()
 	if a.stop != nil {
 		a.stop()
@@ -105,8 +115,14 @@ func (a *App) setup(fyneApp fyne.App) {
 
 // mainMenu returns the menu bar of the window.
 func (a *App) mainMenu() *fyne.Menu {
+	openLog := fyne.NewMenuItem("Open log...", a.openLogDialog)
+	openLog.Shortcut = &desktop.CustomShortcut{
+		KeyName:  fyne.KeyO,
+		Modifier: fyne.KeyModifierShortcutDefault,
+	}
 	return fyne.NewMenu("PingPing",
 		fyne.NewMenuItem("Add target", a.addTarget),
+		openLog,
 		fyne.NewMenuItem("Settings", a.showSettings),
 		fyne.NewMenuItem("Quit", func() { a.fyneApp.Quit() }),
 	)

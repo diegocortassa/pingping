@@ -101,21 +101,36 @@ func (r *chartRenderer) updateLabels() {
 	c := r.chart
 
 	c.mu.RLock()
-	maxRTT := c.maxRTT
+	highest := c.maxRTT
 	window := c.window
+	end := c.end
 	c.mu.RUnlock()
 
-	scale := niceMax(float64(maxRTT) / float64(time.Millisecond))
+	scale := niceMax(float64(highest) / float64(time.Millisecond))
 	for i, label := range r.yLabels {
 		fraction := float64(i) / float64(chartGridLines)
 		label.Text = formatMillis(scale * fraction)
 	}
 
-	now := time.Now()
+	if end.IsZero() {
+		end = time.Now()
+	}
+	start := end.Add(-window)
+	layout := axisTimeFormat(start, end)
 	for i, label := range r.xLabels {
 		fraction := float64(i) / float64(chartGridLines)
-		label.Text = now.Add(-time.Duration((1 - fraction) * float64(window))).Format("15:04")
+		at := start.Add(time.Duration(fraction * float64(window)))
+		label.Text = at.In(time.Local).Format(layout)
 	}
+}
+
+// axisTimeFormat returns the layout of the time labels. The date is added
+// when the range does not start and end on the same day.
+func axisTimeFormat(start, end time.Time) string {
+	if start.Year() == end.Year() && start.YearDay() == end.YearDay() {
+		return "15:04"
+	}
+	return "01-02 15:04"
 }
 
 // formatMillis formats a millisecond value for the axis labels.
