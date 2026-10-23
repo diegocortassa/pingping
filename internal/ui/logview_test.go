@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"fyne.io/fyne/v2/widget"
+
 	"github.com/pingping/pingping/internal/model"
 )
 
@@ -119,5 +121,42 @@ func TestOpenLogRejectsAnEmptyFile(t *testing.T) {
 	path := writeTestLog(t, "timestamp,target_id,address,rtt_ms,success,error\n")
 	if err := app.openLog(path); err == nil {
 		t.Fatal("expected an error for a log without samples")
+	}
+}
+
+func TestLogWindowAppliesTheRange(t *testing.T) {
+	app, _ := newTestApp(t)
+	at := time.Date(2026, 10, 21, 9, 0, 0, 0, time.UTC)
+	lw := &logWindow{
+		app: app,
+		win: app.win,
+		series: groupSamples([]model.Sample{
+			sampleAt("t1", "1.1.1.1", at.Add(-time.Minute), time.Millisecond),
+			sampleAt("t1", "1.1.1.1", at, time.Millisecond),
+			sampleAt("t1", "1.1.1.1", at.Add(time.Hour), time.Millisecond),
+		}),
+		chart:   NewChart(),
+		summary: widget.NewLabel(""),
+		from:    widget.NewEntry(),
+		to:      widget.NewEntry(),
+		preset:  widget.NewSelect(logRangeLabels(), nil),
+	}
+	lw.from.SetText(at.Add(-time.Second).In(time.Local).Format(logTimeLayout))
+	lw.to.SetText(at.Add(time.Minute).In(time.Local).Format(logTimeLayout))
+	lw.applyRange()
+
+	start, end := lw.chart.bounds()
+	if !start.Equal(at.Add(-time.Second)) || !end.Equal(at.Add(time.Minute)) {
+		t.Fatalf("got the range %v - %v", start, end)
+	}
+
+	lw.chart.mu.RLock()
+	count := len(lw.chart.samples)
+	lw.chart.mu.RUnlock()
+	if count != 1 {
+		t.Fatalf("got %d samples in the range, want 1", count)
+	}
+	if lw.summary.Text == "" {
+		t.Fatal("the summary is empty")
 	}
 }
