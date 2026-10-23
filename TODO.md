@@ -2,6 +2,8 @@
 
 ## Done
 
+- [x] Open log: resizable picker window to replace the fixed Fyne file dialog.
+
 - [x] Project skeleton, `go.mod`, dependencies (Fyne v2.8.2, pro-bing v0.9.1).
 - [x] `PLAN.md` with the architecture and the feature breakdown.
 - [x] `internal/config`: config model, JSON serialisation, defaults, paths.

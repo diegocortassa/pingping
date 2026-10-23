@@ -115,7 +115,7 @@ func (a *App) setup(fyneApp fyne.App) {
 
 // mainMenu returns the menu bar of the window.
 func (a *App) mainMenu() *fyne.Menu {
-	openLog := fyne.NewMenuItem("Open log...", a.openLogDialog)
+	openLog := fyne.NewMenuItem("Open log...", a.showOpenLog)
 	openLog.Shortcut = &desktop.CustomShortcut{
 		KeyName:  fyne.KeyO,
 		Modifier: fyne.KeyModifierShortcutDefault,

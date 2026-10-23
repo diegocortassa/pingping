@@ -402,3 +402,12 @@
   the samples and shows a target list when needed.
 - The statistics of a list of samples moved to `history.StatsOf` so the live
   and the log windows share them.
+
+## 2026-10-23
+
+- The Fyne file dialog is a modal popup, it cannot be resized by the user, so
+  the open log requester became a real window with its own small browser:
+  path field, up and logs buttons, folder and CSV list, "All files" switch.
+- `listDir` sorts the folders first and filters the CSV files (case
+  insensitive, dot files skipped); `pickerStartDir` falls back to the home
+  folder when the log folder does not exist yet.
