@@ -75,7 +75,9 @@ The add and edit dialog takes four fields:
 | Enabled | Uncheck it to keep the target but stop probing it. |
 
 Selecting a row of the table shows the graph of that target. The summary line
-below the graph holds the statistics of the visible window.
+below the graph holds the statistics of the visible window. The time axis uses
+clock times on a round interval and slides with the graph, the grid lines are
+the same ticks.
 
 The graph window can be changed with the `Graph` menu or in the settings, the
 `Settings` item of the `PingPing` menu opens them:

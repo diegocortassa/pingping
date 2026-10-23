@@ -141,3 +141,148 @@ func TestAxisTimeFormat(t *testing.T) {
 		t.Fatalf("got %q, want the date and time layout", got)
 	}
 }
+
+func TestAxisTimeFormatAddsTheSecondsToShortRanges(t *testing.T) {
+	at := time.Date(2026, 10, 21, 9, 0, 0, 0, time.UTC)
+	if got := axisTimeFormat(at, at.Add(5*time.Minute)); got != "15:04:05" {
+		t.Fatalf("got %q, want the seconds layout", got)
+	}
+}
+
+func TestAxisStepKeepsTheLabelsApart(t *testing.T) {
+	tests := []struct {
+		window time.Duration
+		width  float32
+		layout string
+		want   time.Duration
+	}{
+		{time.Hour, 574, "15:04", 10 * time.Minute},
+		{24 * time.Hour, 900, "01-02 15:04", 3 * time.Hour},
+		{15 * time.Minute, 574, "15:04", 2 * time.Minute},
+		{time.Minute, 574, "15:04:05", 10 * time.Second},
+	}
+	for _, testCase := range tests {
+		if got := axisStep(testCase.window, testCase.width, testCase.layout); got != testCase.want {
+			t.Fatalf("axisStep(%v, %v) = %v, want %v", testCase.window, testCase.width, got, testCase.want)
+		}
+	}
+}
+
+func TestAxisTicksAlignToTheStep(t *testing.T) {
+	start := time.Date(2026, 10, 21, 8, 3, 0, 0, time.UTC)
+	end := start.Add(time.Hour)
+
+	ticks := axisTicks(start, end, 10*time.Minute)
+	if len(ticks) != 6 {
+		t.Fatalf("got %d ticks, want 6", len(ticks))
+	}
+	first := time.Date(2026, 10, 21, 8, 10, 0, 0, time.UTC)
+	if !ticks[0].At.Equal(first) {
+		t.Fatalf("the first tick is %v, want %v", ticks[0].At, first)
+	}
+	if got, want := ticks[0].Fraction, 7.0/60.0; got != want {
+		t.Fatalf("the first fraction is %v, want %v", got, want)
+	}
+	if !ticks[len(ticks)-1].At.Equal(time.Date(2026, 10, 21, 9, 0, 0, 0, time.UTC)) {
+		t.Fatalf("the last tick is %v", ticks[len(ticks)-1].At)
+	}
+	for i := 1; i < len(ticks); i++ {
+		if !ticks[i].At.After(ticks[i-1].At) {
+			t.Fatalf("the ticks are not sorted: %v", ticks)
+		}
+	}
+}
+
+func TestChartGridFollowsTheTimeTicks(t *testing.T) {
+	test.NewApp()
+
+	chart := NewChart()
+	window := test.NewWindow(chart)
+	defer window.Close()
+	window.Resize(fyne.NewSize(640, 400))
+
+	start := time.Date(2026, 10, 21, 9, 3, 0, 0, time.UTC)
+	end := start.Add(time.Hour)
+	chart.SetRange(nil, start, end)
+
+	chart.mu.RLock()
+	grid := append([]float64(nil), chart.grid...)
+	chart.mu.RUnlock()
+	if len(grid) < 3 {
+		t.Fatalf("got %d grid lines, want at least 3", len(grid))
+	}
+	for i, fraction := range grid {
+		if fraction < 0 || fraction >= 1 {
+			t.Fatalf("the grid fraction %v is outside the plot", fraction)
+		}
+		if i > 0 && fraction <= grid[i-1] {
+			t.Fatalf("the grid fractions are not sorted: %v", grid)
+		}
+		at := start.Add(time.Duration(fraction * float64(end.Sub(start))))
+		if at.Second() != 0 {
+			t.Fatalf("the tick %v is not aligned to a whole minute", at)
+		}
+	}
+}
+
+func TestChartLabelsStayInsideThePlot(t *testing.T) {
+	test.NewApp()
+
+	chart := NewChart()
+	start := time.Date(2026, 10, 21, 9, 3, 0, 0, time.UTC)
+	chart.SetRange(nil, start, start.Add(time.Hour))
+
+	r := newChartRenderer(chart)
+	r.Layout(fyne.NewSize(640, 400))
+
+	count := 0
+	var previousRight float32
+	for _, label := range r.xLabels {
+		if !label.Visible() {
+			continue
+		}
+		width := label.MinSize().Width
+		x := label.Position().X
+		if x < 0 || x+width > 640 {
+			t.Fatalf("the label %q is outside the chart at %v", label.Text, label.Position())
+		}
+		if count > 0 && x < previousRight {
+			t.Fatalf("the label %q overlaps the previous one at %v", label.Text, label.Position())
+		}
+		previousRight = x + width
+		count++
+	}
+	if count < 3 {
+		t.Fatalf("got %d labels, want at least 3", count)
+	}
+	if count != len(r.tickFractions) {
+		t.Fatalf("got %d labels and %d ticks", count, len(r.tickFractions))
+	}
+}
+
+func TestChartTicksSlideWithTheRange(t *testing.T) {
+	test.NewApp()
+
+	chart := NewChart()
+	start := time.Date(2026, 10, 21, 9, 3, 0, 0, time.UTC)
+	end := start.Add(time.Hour)
+	chart.SetRange(nil, start, end)
+
+	r := newChartRenderer(chart)
+	r.Layout(fyne.NewSize(640, 400))
+
+	r.updateLabels()
+	r.layoutLabels()
+	first, second := r.tickFractions[0], r.xLabels[0].Position().X
+
+	chart.SetRange(nil, start.Add(2*time.Second), end.Add(2*time.Second))
+	r.updateLabels()
+	r.layoutLabels()
+
+	if r.tickFractions[0] >= first {
+		t.Fatalf("the tick did not slide: %v >= %v", r.tickFractions[0], first)
+	}
+	if r.xLabels[0].Position().X >= second {
+		t.Fatalf("the label did not slide: %v >= %v", r.xLabels[0].Position().X, second)
+	}
+}

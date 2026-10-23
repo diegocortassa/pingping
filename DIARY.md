@@ -424,3 +424,24 @@
   width even after the range filled them. The bar is now a Border with the two
   times in a two column grid, so they share the free width (about 330 each on
   the default window) and grow with the window.
+
+## 2026-10-23 (0.5.4)
+
+### Observations
+
+- The time axis and the graph seemed to update at different times: the graph
+  moved every second, while the axis labels only changed when the minute
+  rolled over. The labels were at fixed fractions of the width and only their
+  text was recomputed, the grid lines were fixed too.
+- The labels and the raster also took two separate `time.Now()` calls, so
+  they could use different right edges.
+
+### Decisions
+
+- The axis now uses absolute clock ticks on a round interval (1s to 30 days,
+  chosen from the window and the plot width), so the labels and the grid lines
+  slide left with the data and new ticks enter at the right edge.
+- The time base is anchored once per refresh and shared by the labels and the
+  raster, so they always describe the same range.
+- The label pool is fixed (16) and unused labels are hidden; positions are
+  clamped inside the chart so the edge labels are not cut off.

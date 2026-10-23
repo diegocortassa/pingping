@@ -33,6 +33,8 @@ type Chart struct {
 	samples []model.Sample
 	window  time.Duration
 	end     time.Time
+	anchor  time.Time
+	grid    []float64
 	maxRTT  time.Duration
 	colors  chartColors
 
@@ -166,6 +168,8 @@ func (c *Chart) render(w, h int) image.Image {
 	samples := c.samples
 	window := c.window
 	end := c.end
+	anchor := c.anchor
+	grid := c.grid
 	highest := c.maxRTT
 	colors := c.colors
 	c.mu.RUnlock()
@@ -173,9 +177,11 @@ func (c *Chart) render(w, h int) image.Image {
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
 	draw.Draw(img, img.Bounds(), &image.Uniform{C: colors.background}, image.Point{}, draw.Src)
 
-	for i := 1; i < chartGridLines; i++ {
-		x := int(float64(w) * float64(i) / chartGridLines)
-		drawVLine(img, x, 0, h, colors.grid)
+	for _, fraction := range grid {
+		if fraction <= 0 || fraction >= 1 {
+			continue
+		}
+		drawVLine(img, int(fraction*float64(w)), 0, h, colors.grid)
 	}
 
 	scale := niceMax(float64(highest) / float64(time.Millisecond))
@@ -183,10 +189,13 @@ func (c *Chart) render(w, h int) image.Image {
 		return img
 	}
 
-	start := time.Now().Add(-window)
-	if !end.IsZero() {
-		start = end.Add(-window)
+	if end.IsZero() {
+		end = anchor
 	}
+	if end.IsZero() {
+		end = time.Now()
+	}
+	start := end.Add(-window)
 	buckets := bucketSamples(samples, start, window, w, scale)
 
 	prevX, prevY := -1, -1

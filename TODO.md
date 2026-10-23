@@ -2,6 +2,8 @@
 
 ## Done
 
+- [x] Sliding time axis with clock-aligned ticks, shared by the grid and the labels (0.5.4).
+
 - [x] Log window: give the From and To time fields a usable width (0.5.3).
 
 - [x] Open log: size the Fyne file dialog to the main window (0.5.2).
