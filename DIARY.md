@@ -478,11 +478,17 @@
   macOS assets are built natively for ARM64 and Intel.
 - The RPM job now prepends standard system paths and invokes `/usr/bin/dnf`
   explicitly after CI reported `dnf: command not found`.
+- RPM staging now copies the expected x86_64 package path explicitly, so a
+  missing or differently named package fails during the Make step.
+- The generated RPM spec now installs the binary and icon into `%{buildroot}`
+  and declares both in `%files`.
 - Documented local release commands and the tag-push release process.
 
 ### Verification
 
 - `actionlint .github/workflows/release.yml` passes.
+- `make release-rpm` was run in an isolated Rocky Linux 9 container; `rpmbuild`
+  wrote the RPM and the Make target staged it in `dist/release/`.
 - `make -n release-linux VERSION=0.5.5`, `make -n release-checksums`, and a
   prerelease archive dry run confirm Make target wiring and asset names without
   producing release artifacts.

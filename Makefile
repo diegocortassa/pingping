@@ -66,7 +66,7 @@ release-deb: deb
 ## release-rpm: build and stage the RPM package in $(RELEASE)
 release-rpm: rpm
 	@mkdir -p $(RELEASE)
-	@find $(DIST)/rpm/RPMS -type f -name '*.rpm' -exec cp {} $(RELEASE)/ \;
+	cp $(DIST)/rpm/RPMS/x86_64/$(BINARY)-$(PKGVER)-1.x86_64.rpm $(RELEASE)/
 
 ## release-linux: build Linux, Windows and DEB release assets
 release-linux: release-archive release-windows release-deb
@@ -133,11 +133,9 @@ deb: build
 
 ## rpm: build an RPM package
 rpm: build
-	@mkdir -p $(DIST)/rpm/BUILDROOT/usr/bin $(DIST)/rpm/BUILDROOT/usr/share/icons/hicolor/512x512/apps
-	@mkdir -p $(DIST)/rpm/SPECS $(DIST)/rpm/SOURCES $(DIST)/rpm/Build $(DIST)/rpm/RPMS $(DIST)/rpm/SRPMS
-	cp $(DIST)/$(BINARY) $(DIST)/rpm/BUILDROOT/usr/bin/$(BINARY)
-	cp assets/icons/icon.png $(DIST)/rpm/BUILDROOT/usr/share/icons/hicolor/512x512/apps/$(BINARY).png
+	@mkdir -p $(DIST)/rpm/BUILD $(DIST)/rpm/BUILDROOT $(DIST)/rpm/RPMS $(DIST)/rpm/SOURCES $(DIST)/rpm/SPECS $(DIST)/rpm/SRPMS
 	@printf 'Name: %s\nVersion: %s\nRelease: 1\nSummary: PingPing network monitor\nLicense: BSD-3-Clause\nBuildArch: x86_64\nRequires: glibc\n%%description\nReal time ping monitoring with graphs and daily rotated logs.\n' \
 		"$(BINARY)" "$(PKGVER)" > $(DIST)/rpm/SPECS/$(BINARY).spec
+	@printf '%%install\ninstall -Dpm 0755 "$(CURDIR)/$(DIST)/$(BINARY)" "%%{buildroot}/usr/bin/$(BINARY)"\ninstall -Dpm 0644 "$(CURDIR)/assets/icons/icon.png" "%%{buildroot}/usr/share/icons/hicolor/512x512/apps/$(BINARY).png"\n\n%%files\n/usr/bin/$(BINARY)\n/usr/share/icons/hicolor/512x512/apps/$(BINARY).png\n' >> $(DIST)/rpm/SPECS/$(BINARY).spec
 	rpmbuild --define "_topdir $(CURDIR)/$(DIST)/rpm" -bb $(DIST)/rpm/SPECS/$(BINARY).spec
 	@echo "built $(DIST)/rpm/RPMS/x86_64/$(BINARY)-$(PKGVER)-1.x86_64.rpm"
