@@ -31,7 +31,6 @@ jobs:
             libglx-dev \
             libwayland-dev \
             libxkbcommon-dev \
-            rpm \
             wayland-protocols \
             xorg-dev \
             zip
@@ -42,7 +41,7 @@ jobs:
       - name: Install Windows resource tool
         run: make install-winres
 
-      - name: Build Linux, Windows, DEB, and RPM assets
+      - name: Build Linux, Windows, and DEB assets
         run: make release-linux VERSION="${GITHUB_REF_NAME#v}"
 
       - name: Upload Linux release assets
@@ -50,6 +49,54 @@ jobs:
         with:
           name: release-linux
           path: dist/release/*
+          if-no-files-found: error
+
+  build-rpm:
+    runs-on: ubuntu-latest
+    container:
+      image: rockylinux/rockylinux:9
+    defaults:
+      run:
+        shell: /bin/bash -e {0}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install RPM build dependencies
+        run: |
+          dnf install -y bash 'dnf-command(config-manager)'
+          dnf config-manager --set-enabled crb
+          dnf install -y \
+            desktop-file-utils \
+            gcc \
+            git \
+            libX11-devel \
+            libXcursor-devel \
+            libXi-devel \
+            libXinerama-devel \
+            libXrandr-devel \
+            libXxf86vm-devel \
+            libxkbcommon-devel \
+            make \
+            mesa-libGL-devel \
+            rpm-build \
+            wayland-devel \
+            which
+
+      - name: Build and stage RPM
+        run: make release-rpm VERSION="${GITHUB_REF_NAME#v}"
+
+      - name: Upload RPM release asset
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-rpm
+          path: dist/release/*.rpm
           if-no-files-found: error
 
   build-macos:
@@ -83,7 +130,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: [build-linux, build-macos]
+    needs: [build-linux, build-rpm, build-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -136,8 +136,9 @@ above is complete for the initial version.
 
 ## 9. GitHub release automation
 
-- Build Linux archives, Debian/RPM packages, and a Windows archive through
-  reusable Makefile targets on Linux.
+- Build Linux archives, Debian packages, and a Windows archive through
+  reusable Makefile targets on Ubuntu; build RPM packages in a Rocky Linux 9
+  container through a separate Makefile target.
 - Build macOS archives natively for both supported runner architectures.
 - Trigger the workflow for version tags, collect the staged release assets,
   generate checksums through Make, and publish them as a GitHub Release.

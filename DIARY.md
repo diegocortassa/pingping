@@ -473,9 +473,9 @@
 ### Changes
 
 - Added Make targets to build and stage Linux, Windows, Debian, RPM, and native
-  macOS release assets, plus SHA-256 checksums.
-- Added a tag-triggered GitHub Actions workflow. Build/package operations run
-  through Make targets; macOS assets are built natively for ARM64 and Intel.
+  macOS release assets, plus SHA-256 checksums. RPM now has a separate target.
+- Added a tag-triggered GitHub Actions workflow. RPM builds in Rocky Linux 9;
+  macOS assets are built natively for ARM64 and Intel.
 - Documented local release commands and the tag-push release process.
 
 ### Verification

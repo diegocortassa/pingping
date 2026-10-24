@@ -373,19 +373,27 @@ make rpm   # RPM package in dist
 ### Releases
 
 The GitHub Actions release workflow runs when a `v*` version tag is pushed. It
-builds Linux and Windows assets on Linux, and macOS archives on native ARM64
-and Intel runners. The Linux release target also builds the DEB and RPM
-packages. Release files are staged in `dist/release/`.
+builds Linux and Windows assets plus the DEB package on Ubuntu, builds the RPM
+in a Rocky Linux 9 container, and builds macOS archives on native ARM64 and
+Intel runners. Release files are staged in `dist/release/`.
 
 The Make targets can also be run locally:
 
 ```bash
-make release-linux VERSION=0.5.5   # Linux, Windows, DEB and RPM assets
+make release-linux VERSION=0.5.5   # Linux, Windows and DEB assets
+make release-rpm VERSION=0.5.5     # RPM asset; run on an RPM-capable system
 make release-macos VERSION=0.5.5   # run on macOS; builds for the host architecture
 make release-checksums             # checksum files already staged in dist/release
 ```
 
 `release-linux` requires the Linux/Fyne development dependencies above, plus
-`gcc-mingw-w64-x86-64`, `dpkg-dev`, `rpm`, `zip`, and the `go-winres` tool
-(`make install-winres`). To publish through GitHub Actions, push a version
-tag, for example `git push origin v0.5.5`.
+`gcc-mingw-w64-x86-64`, `dpkg-dev`, `zip`, and the `go-winres` tool
+(`make install-winres`). `release-rpm` requires the RPM build dependencies;
+the workflow runs it in Rocky Linux 9.
+
+### Publishing through GitHub Actions
+To publish through GitHub Actions,
+create a tag, for example:
+`git tag -a v0.5.5 -m "PingPing 0.5.5"`
+and  push:
+`git push origin v0.5.5`

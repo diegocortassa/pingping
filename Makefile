@@ -15,7 +15,7 @@ WIN_CC   ?= x86_64-w64-mingw32-gcc
 WINRES   := rsrc_windows_amd64.syso
 
 .PHONY: all build build-windows windows-resource release-archive release-linux \
-	release-windows release-macos release-linux-packages release-checksums \
+	release-windows release-macos release-deb release-rpm release-checksums \
 	test audit run clean icons install-tools install-winres deb rpm
 
 all: build
@@ -58,14 +58,18 @@ release-windows: build-windows
 	@mkdir -p $(RELEASE)
 	zip -j -q $(RELEASE)/$(BINARY)_$(RELEASE_VERSION)_windows_amd64.zip $(DIST)/$(BINARY).exe README.md
 
-## release-linux-packages: stage Debian and RPM packages in $(RELEASE)
-release-linux-packages: deb rpm
+## release-deb: stage the Debian package in $(RELEASE)
+release-deb: deb
 	@mkdir -p $(RELEASE)
 	cp $(DIST)/$(BINARY)_$(PKGVER)_amd64.deb $(RELEASE)/
+
+## release-rpm: build and stage the RPM package in $(RELEASE)
+release-rpm: rpm
+	@mkdir -p $(RELEASE)
 	@find $(DIST)/rpm/RPMS -type f -name '*.rpm' -exec cp {} $(RELEASE)/ \;
 
-## release-linux: build Linux, Windows, DEB and RPM release assets
-release-linux: release-archive release-windows release-linux-packages
+## release-linux: build Linux, Windows and DEB release assets
+release-linux: release-archive release-windows release-deb
 
 ## release-macos: package the native macOS binary into a tar.gz archive
 release-macos: release-archive
