@@ -14,9 +14,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/prometheus-community/pro-bing"
+	probing "github.com/prometheus-community/pro-bing"
 
-	"github.com/pingping/pingping/internal/config"
+	"github.com/diegocortassa/pingping/internal/config"
 )
 
 // Result is the outcome of a single probe.

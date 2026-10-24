@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pingping/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/model"
 )
 
 // requiredColumns are the columns a log file must have to be readable.

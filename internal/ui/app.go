@@ -12,12 +12,12 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/pingping/pingping/assets/icons"
-	"github.com/pingping/pingping/internal/config"
-	"github.com/pingping/pingping/internal/history"
-	"github.com/pingping/pingping/internal/logstore"
-	"github.com/pingping/pingping/internal/model"
-	"github.com/pingping/pingping/internal/monitor"
+	"github.com/diegocortassa/pingping/assets/icons"
+	"github.com/diegocortassa/pingping/internal/config"
+	"github.com/diegocortassa/pingping/internal/history"
+	"github.com/diegocortassa/pingping/internal/logstore"
+	"github.com/diegocortassa/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/monitor"
 )
 
 // Columns of the target table.

@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/pingping/pingping/internal/appinfo"
+	"github.com/diegocortassa/pingping/internal/appinfo"
 )
 
 func TestMainMenuHasTheHelpEntry(t *testing.T) {

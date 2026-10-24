@@ -8,7 +8,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/pingping/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/model"
 )
 
 func sampleAt(id, address string, at time.Time, rtt time.Duration) model.Sample {

@@ -2,7 +2,7 @@ BINARY   := pingping
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.1.0)
 PKGVER   := $(shell echo $(VERSION) | sed 's/^v//; s/-.*//')
 DIST     := dist
-PKG      := github.com/pingping/pingping
+PKG      := github.com/diegocortassa/pingping
 LDFLAGS  := -s -w -X $(PKG)/internal/appinfo.Version=$(VERSION)
 WINFLAGS := $(LDFLAGS) -H=windowsgui
 GOFLAGS  := -trimpath

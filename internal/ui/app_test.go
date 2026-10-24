@@ -8,11 +8,11 @@ import (
 	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/pingping/pingping/internal/config"
-	"github.com/pingping/pingping/internal/history"
-	"github.com/pingping/pingping/internal/logstore"
-	"github.com/pingping/pingping/internal/model"
-	"github.com/pingping/pingping/internal/monitor"
+	"github.com/diegocortassa/pingping/internal/config"
+	"github.com/diegocortassa/pingping/internal/history"
+	"github.com/diegocortassa/pingping/internal/logstore"
+	"github.com/diegocortassa/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/monitor"
 )
 
 func newTestApp(t *testing.T, targets ...config.Target) (*App, *history.History) {

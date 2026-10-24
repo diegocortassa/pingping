@@ -1,4 +1,4 @@
-module github.com/pingping/pingping
+module github.com/diegocortassa/pingping
 
 go 1.27.3
 

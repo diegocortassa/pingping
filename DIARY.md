@@ -155,7 +155,7 @@
 
 - The metadata of the application lives in `internal/appinfo`: the name, the
   author, a short description and the version. The build sets the version with
-  `-X github.com/pingping/pingping/internal/appinfo.Version`, the `main`
+  `-X github.com/diegocortassa/pingping/internal/appinfo.Version`, the `main`
   package and the interface read the same value, so the about dialog and the
   `-version` flag can never disagree.
 - The about dialog is built by `aboutContent`, a separate function, so the
@@ -321,7 +321,7 @@
 
 ### Decisions
 
-- The name is now PingPing, the module path is `github.com/pingping/pingping`
+- The name is now PingPing, the module path is `github.com/diegocortassa/pingping`
   and the binary is `pingping`. The identifier of the Fyne application is
   `com.pingping.pingping`.
 - The configuration and the data directory follow the name, they are now

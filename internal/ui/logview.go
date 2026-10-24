@@ -13,10 +13,10 @@ import (
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/pingping/pingping/assets/icons"
-	"github.com/pingping/pingping/internal/history"
-	"github.com/pingping/pingping/internal/logstore"
-	"github.com/pingping/pingping/internal/model"
+	"github.com/diegocortassa/pingping/assets/icons"
+	"github.com/diegocortassa/pingping/internal/history"
+	"github.com/diegocortassa/pingping/internal/logstore"
+	"github.com/diegocortassa/pingping/internal/model"
 )
 
 // logTimeLayout is the layout of the times entered in a log window.

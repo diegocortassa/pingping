@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/test"
 
-	"github.com/pingping/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/model"
 )
 
 func TestNiceMax(t *testing.T) {

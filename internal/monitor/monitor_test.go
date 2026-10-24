@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pingping/pingping/internal/config"
-	"github.com/pingping/pingping/internal/model"
-	"github.com/pingping/pingping/internal/ping"
+	"github.com/diegocortassa/pingping/internal/config"
+	"github.com/diegocortassa/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/ping"
 )
 
 // fakePinger reports a fixed number of samples and then stops.

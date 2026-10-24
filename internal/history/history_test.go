@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pingping/pingping/internal/model"
+	"github.com/diegocortassa/pingping/internal/model"
 )
 
 func sample(at time.Time, rtt time.Duration, ok bool) model.Sample {
