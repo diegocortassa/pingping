@@ -77,15 +77,22 @@ func (h *History) SetWindow(window time.Duration) {
 	h.window = window
 }
 
-// Add stores a sample and drops the ones that left the window.
+// Add stores a sample and caps the retained series at maxSamplesPerTarget.
 func (h *History) Add(s model.Sample) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	samples := append(h.series[s.TargetID], s)
-	sort.SliceStable(samples, func(i, j int) bool {
-		return samples[i].Time.Before(samples[j].Time)
-	})
+	samples := h.series[s.TargetID]
+	if len(samples) == 0 || !s.Time.Before(samples[len(samples)-1].Time) {
+		samples = append(samples, s)
+	} else {
+		index := sort.Search(len(samples), func(i int) bool {
+			return samples[i].Time.After(s.Time)
+		})
+		samples = append(samples, model.Sample{})
+		copy(samples[index+1:], samples[index:])
+		samples[index] = s
+	}
 	if len(samples) > maxSamplesPerTarget {
 		samples = samples[len(samples)-maxSamplesPerTarget:]
 	}

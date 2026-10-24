@@ -247,10 +247,11 @@ func (a *App) saveConfig() {
 
 // durationValidator checks that a field holds a positive duration.
 func durationValidator(text string) error {
-	if _, err := time.ParseDuration(strings.TrimSpace(text)); err != nil {
+	parsed, err := time.ParseDuration(strings.TrimSpace(text))
+	if err != nil {
 		return errors.New("not a valid duration, for example 5s or 1m")
 	}
-	if parseDuration(text) <= 0 {
+	if parsed <= 0 {
 		return errors.New("the duration must be positive")
 	}
 	return nil

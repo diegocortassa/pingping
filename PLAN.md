@@ -133,3 +133,15 @@ above is complete for the initial version.
 - `internal/monitor`: target lifecycle with a fake pinger.
 - `internal/ping`: sequence tracking and timeout detection with a fake transport.
 - `internal/ui`: headless smoke test with the Fyne test driver.
+
+## 8. Approved maintenance follow-up
+
+- Use one cancellable app-level chart ticker and refresh only the selected live
+    chart; historical charts do not need periodic refreshes.
+- Reuse target statistics during a UI refresh instead of recalculating them
+  for every table cell.
+- Keep history samples sorted without sorting the full series on each
+  chronological sample, while preserving correct ordering for late samples.
+- Share duplicate diagnostic and summary text, parse duration input once, and
+  correct history retention comments and test naming.
+- Verify the focused packages and full test suite; run available static checks.

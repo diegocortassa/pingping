@@ -2,6 +2,7 @@
 package ui
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -51,11 +52,14 @@ type App struct {
 	status  *widget.Label
 	toolbar *fyne.Container
 
-	rows        []config.Target
-	selectedRow int
-	charts      map[string]*Chart
-	labels      map[string]*widget.Label
-	stop        func()
+	rows          []config.Target
+	selectedRow   int
+	charts        map[string]*Chart
+	stats         map[string]history.Stats
+	labels        map[string]*widget.Label
+	stop          func()
+	refreshCancel context.CancelFunc
+	refreshDone   chan struct{}
 }
 
 // New returns the user interface.
@@ -67,6 +71,7 @@ func New(cfg *config.Config, cfgPath string, mon *monitor.Monitor, hist *history
 		hist:    hist,
 		store:   store,
 		charts:  make(map[string]*Chart),
+		stats:   make(map[string]history.Stats),
 		labels:  make(map[string]*widget.Label),
 	}
 }
@@ -87,6 +92,7 @@ func (a *App) Run() {
 	if a.stop != nil {
 		a.stop()
 	}
+	a.stopRefresh()
 }
 
 // setup builds the window, the widgets and the system tray.
@@ -111,6 +117,48 @@ func (a *App) setup(fyneApp fyne.App) {
 			a.onSample(s)
 		}
 	}()
+	a.startRefresh()
+}
+
+func (a *App) startRefresh() {
+	ctx, cancel := context.WithCancel(context.Background())
+	a.refreshCancel = cancel
+	a.refreshDone = make(chan struct{})
+	go func() {
+		defer close(a.refreshDone)
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				fyne.Do(func() {
+					if ctx.Err() != nil {
+						return
+					}
+					index := a.tabs.SelectedIndex()
+					if index < 0 || index >= len(a.rows) {
+						return
+					}
+					chart := a.charts[a.rows[index].ID]
+					if chart != nil && chart.isLive() {
+						chart.Refresh()
+					}
+				})
+			}
+		}
+	}()
+}
+
+func (a *App) stopRefresh() {
+	if a.refreshCancel == nil {
+		return
+	}
+	a.refreshCancel()
+	<-a.refreshDone
+	a.refreshCancel = nil
+	a.refreshDone = nil
 }
 
 // mainMenu returns the menu bar of the window.
@@ -211,13 +259,16 @@ func (a *App) rebuild() {
 
 	items := make([]*container.TabItem, 0, len(a.rows))
 	a.charts = make(map[string]*Chart)
+	a.stats = make(map[string]history.Stats, len(a.rows))
 	a.labels = make(map[string]*widget.Label)
 
 	for _, t := range a.rows {
 		chart := NewChart()
+		stats := a.hist.Stats(t.ID)
+		a.stats[t.ID] = stats
 		chart.SetSamples(a.hist.Samples(t.ID), a.cfg.GraphWindow.Duration())
 
-		label := widget.NewLabel(a.statsText(t.ID))
+		label := widget.NewLabel(a.statsText(stats))
 		label.Wrapping = fyne.TextWrapWord
 		a.charts[t.ID] = chart
 		a.labels[t.ID] = label
@@ -248,7 +299,7 @@ func (a *App) updateCell(id widget.TableCellID, obj fyne.CanvasObject) {
 	}
 
 	target := a.rows[id.Row-1]
-	stats := a.hist.Stats(target.ID)
+	stats := a.stats[target.ID]
 
 	switch id.Col {
 	case colAddress:
@@ -282,19 +333,22 @@ func (a *App) onRowSelected(id widget.TableCellID) {
 }
 
 // statsText returns the summary line of a target.
-func (a *App) statsText(targetID string) string {
-	stats := a.hist.Stats(targetID)
+func (a *App) statsText(stats history.Stats) string {
 	if stats.Count == 0 {
 		return "Waiting for the first probe..."
 	}
 
-	summary := fmt.Sprintf("Last %s | Average %s | Min %s | Max %s | Jitter %s | Loss %.1f%% | %d probes",
-		rttText(stats), avgText(stats), durationText(stats.Min), durationText(stats.Max),
-		durationText(stats.Jitter), stats.Loss, stats.Count)
+	summary := statsSummary(stats)
 	if stats.LastError != "" {
 		summary += " | Error: " + stats.LastError
 	}
 	return summary
+}
+
+func statsSummary(stats history.Stats) string {
+	return fmt.Sprintf("Last %s | Average %s | Min %s | Max %s | Jitter %s | Loss %.1f%% | %d probes",
+		rttText(stats), avgText(stats), durationText(stats.Min), durationText(stats.Max),
+		durationText(stats.Jitter), stats.Loss, stats.Count)
 }
 
 // refreshMenu rebuilds the menu bar so the check marks follow the settings.
@@ -369,9 +423,11 @@ func (a *App) onSample(s model.Sample) {
 		if !ok {
 			return
 		}
+		stats := a.hist.Stats(s.TargetID)
+		a.stats[s.TargetID] = stats
 		chart.SetSamples(a.hist.Samples(s.TargetID), a.cfg.GraphWindow.Duration())
 		if label, ok := a.labels[s.TargetID]; ok {
-			label.SetText(a.statsText(s.TargetID))
+			label.SetText(a.statsText(stats))
 		}
 		a.table.Refresh()
 	})

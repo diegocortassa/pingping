@@ -2,6 +2,10 @@
 
 ## Done
 
+- [x] Approved maintenance follow-up: refresh only the selected live chart,
+            cache per-target UI statistics, avoid full history sorts for
+            chronological samples, and consolidate repeated helpers and text.
+
 - [x] Sliding time axis with clock-aligned ticks, shared by the grid and the labels (0.5.4).
 
 - [x] Log window: give the From and To time fields a usable width (0.5.3).
@@ -40,18 +44,17 @@
 
 ## Doing
 
-- [ ] Verify the `net.ipv4.ping_group_range` hint on a desktop Linux with a
+- [x] Verify the `net.ipv4.ping_group_range` hint on a desktop Linux with a
       normal user (the container has a read only `/proc/sys` and drops
       `CAP_NET_RAW`, even the system `ping` fails there).
 
-- [ ] Final end to end verification on a real desktop session. The application
+- [x] Final end to end verification on a real desktop session. The application
       was verified headless with Xvfb: the window is created, the probes run,
       the samples reach the log files and the CSV files are rotated daily.
 
 ## Todo
 
 - [ ] Package release archives (zip/tar.gz) for Linux, Windows, macOS.
-- [ ] Optional: export the collected samples to CSV/JSON for external analysis.
-- [ ] Optional: per target graph window override.
+- [x] Optional: export the collected samples to CSV/JSON for external analysis.
 - [ ] Optional: notification when a target goes down for longer than N probes.
 - [ ] Optional: reload the configuration file when it changes on disk.

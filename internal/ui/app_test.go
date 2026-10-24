@@ -40,6 +40,12 @@ func newTestApp(t *testing.T, targets ...config.Target) (*App, *history.History)
 
 	ui := New(cfg, dir+"/config.json", mon, hist, store)
 	ui.setup(test.NewApp())
+	t.Cleanup(func() {
+		if ui.stop != nil {
+			ui.stop()
+		}
+		ui.stopRefresh()
+	})
 	return ui, hist
 }
 
@@ -62,6 +68,17 @@ func TestAppBuildsTheTargetTable(t *testing.T) {
 	}
 	if cols != columnCount {
 		t.Fatalf("got %d columns, want %d", cols, columnCount)
+	}
+}
+
+func TestAppStopsRefreshLoop(t *testing.T) {
+	app, _ := newTestApp(t, target("t1", "1.1.1.1"))
+	done := app.refreshDone
+	app.stopRefresh()
+	select {
+	case <-done:
+	default:
+		t.Fatal("app refresh loop is still running")
 	}
 }
 

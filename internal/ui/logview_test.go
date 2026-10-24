@@ -115,6 +115,7 @@ func TestOpenLogShowsAWindow(t *testing.T) {
 	if got := len(app.fyneApp.Driver().AllWindows()); got != before+1 {
 		t.Fatalf("got %d windows, want %d", got, before+1)
 	}
+	app.fyneApp.Driver().AllWindows()[before].Close()
 }
 
 func TestOpenLogRejectsAnEmptyFile(t *testing.T) {
@@ -197,4 +198,5 @@ func TestLogWindowGivesRoomToTheTimeFields(t *testing.T) {
 	if lw.to.Size().Width < 200 {
 		t.Fatalf("the to field is %v wide", lw.to.Size())
 	}
+	lw.win.Close()
 }

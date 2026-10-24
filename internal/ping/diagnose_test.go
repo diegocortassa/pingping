@@ -36,7 +36,7 @@ func TestReportExplainsAFailure(t *testing.T) {
 	}
 
 	text := report.String()
-	for _, want := range []string{"ping_group_range", "setcap", "FAILED"} {
+	for _, want := range []string{linuxGroupRangeCommand, "setcap", "FAILED"} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("%q is missing in %q", want, text)
 		}

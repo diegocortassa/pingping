@@ -9,5 +9,5 @@ package ping
 //
 // See https://www.kernel.org/doc/html/latest/networking/ip-sysctl.html
 func privilegeHint() string {
-	return `unprivileged ICMP is blocked, allow it with: sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"`
+	return "unprivileged ICMP is blocked, allow it with: " + linuxGroupRangeCommand
 }

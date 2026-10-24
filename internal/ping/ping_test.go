@@ -107,6 +107,9 @@ func TestAutoModeReportsTheRootCause(t *testing.T) {
 		if !strings.Contains(result.Err, "ping_group_range") && !strings.Contains(result.Err, "CAP_NET_RAW") {
 			t.Fatalf("the hint is missing in %q", result.Err)
 		}
+		if !strings.Contains(result.Err, linuxGroupRangeCommand) {
+			t.Fatalf("the Linux fix command is missing in %q", result.Err)
+		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for a result")
 	}

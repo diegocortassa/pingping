@@ -27,7 +27,7 @@ func TestAddAndSamples(t *testing.T) {
 	}
 }
 
-func TestAddPrunesOldSamples(t *testing.T) {
+func TestSamplesExcludeOldSamples(t *testing.T) {
 	now := time.Now()
 	h := New(time.Minute)
 
@@ -39,7 +39,7 @@ func TestAddPrunesOldSamples(t *testing.T) {
 	}
 }
 
-func TestSetWindowPrunes(t *testing.T) {
+func TestSetWindowFiltersSamplesWithoutDroppingHistory(t *testing.T) {
 	now := time.Now()
 	h := New(time.Hour)
 	h.Add(sample(now.Add(-30*time.Minute), 10*time.Millisecond, true))
@@ -57,6 +57,25 @@ func TestSetWindowPrunes(t *testing.T) {
 	h.mu.RUnlock()
 	if stored != 2 {
 		t.Fatalf("got %d samples in memory, want 2", stored)
+	}
+}
+
+func TestAddKeepsOutOfOrderSamplesSorted(t *testing.T) {
+	base := time.Now()
+	h := New(time.Hour)
+	h.Add(sample(base.Add(time.Second), 20*time.Millisecond, true))
+	h.Add(sample(base, 10*time.Millisecond, true))
+	h.Add(sample(base.Add(time.Second), 30*time.Millisecond, true))
+
+	samples := h.SamplesInsideWindow("t1", base.Add(2*time.Second))
+	if len(samples) != 3 {
+		t.Fatalf("got %d samples, want 3", len(samples))
+	}
+	if !samples[0].Time.Equal(base) {
+		t.Fatalf("got first sample at %v, want %v", samples[0].Time, base)
+	}
+	if samples[1].RTT != 20*time.Millisecond || samples[2].RTT != 30*time.Millisecond {
+		t.Fatalf("equal-time samples were reordered: %v, %v", samples[1].RTT, samples[2].RTT)
 	}
 }
 

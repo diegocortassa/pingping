@@ -445,3 +445,25 @@
   raster, so they always describe the same range.
 - The label pool is fixed (16) and unused labels are hidden; positions are
   clamped inside the chart so the edge labels are not cut off.
+
+## 2026-10-24 - Maintenance optimizations
+
+### Changes
+
+- The app now owns one cancellable chart ticker and refreshes only the selected
+    live chart. Historical charts and hidden tabs do not run periodic refreshes.
+- Target statistics are computed once per sample/update and shared by the
+  target summary and table cells.
+- History appends chronological samples directly and uses ordered insertion
+  for late samples, retaining stable ordering for equal timestamps.
+- Shared the Linux ICMP remediation command and the common statistics summary,
+  and removed a redundant duration parse in form validation.
+- Corrected the history retention comment and the test name to match the
+  actual query-time filtering behavior.
+
+### Verification
+
+- `make test`, `go vet ./...`, and `gofmt` checks pass.
+- `staticcheck` could not run because the installed binary was built with Go
+  1.24.2, older than the module's Go 1.27.3 requirement. `govulncheck` was not
+  reached by `make audit` after that failure.

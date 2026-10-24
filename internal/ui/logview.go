@@ -205,9 +205,7 @@ func logSummary(samples []model.Sample, start, end time.Time) string {
 	}
 
 	stats := history.StatsOf(samples)
-	return fmt.Sprintf("%s | Last %s | Average %s | Min %s | Max %s | Jitter %s | Loss %.1f%% | %d probes",
-		span, rttText(stats), avgText(stats), durationText(stats.Min), durationText(stats.Max),
-		durationText(stats.Jitter), stats.Loss, stats.Count)
+	return span + " | " + statsSummary(stats)
 }
 
 // groupSamples splits the samples of a log file by target, keeping the order

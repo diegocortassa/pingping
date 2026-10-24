@@ -9,6 +9,8 @@ import (
 	"golang.org/x/net/icmp"
 )
 
+const linuxGroupRangeCommand = `sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"`
+
 // Report describes what the system allows for the ICMP probes.
 type Report struct {
 	// OS is the operating system the report was made on.
@@ -73,7 +75,7 @@ func (r Report) String() string {
 	if r.Unprivileged != nil {
 		b.WriteString("  the unprivileged socket needs the group of the user inside\n")
 		b.WriteString("  net.ipv4.ping_group_range:\n")
-		b.WriteString("      sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"\n")
+		b.WriteString("      " + linuxGroupRangeCommand + "\n")
 	}
 	if r.Privileged != nil {
 		b.WriteString("  the privileged socket needs root or the CAP_NET_RAW capability:\n")
