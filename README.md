@@ -1,10 +1,10 @@
 # PingPing
 
+<img src="assets/icons/icon.png" width="64" alt="PingPing icon">
+
 A portable network monitoring tool. PingPing pings the addresses you configure,
 shows the round trip time in real time, keeps a daily rotated log of every probe
 and stays in the system tray while it monitors.
-
-![PingPing](assets/icons/icon.png)
 
 ## Features
 
@@ -25,10 +25,7 @@ and stays in the system tray while it monitors.
 The main window shows the list of the monitored targets on the left and the
 graph of the selected target on the right.
 
-| Target | Interval | Status | Last | Average | Loss |
-| ------ | -------- | ------ | ---- | ------- | ---- |
-| 1.1.1.1 | 5s | up | 12.4ms | 11.9ms | 0.0% |
-| 10.255.255.1 | 5s | down | - | - | 100.0% |
+<img src="assets/screenshot_01.png" width="960" alt="PingPing dashboard with monitored targets and a live graph">
 
 ## Installation
 
