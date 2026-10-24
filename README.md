@@ -370,6 +370,26 @@ make deb   # Debian package in dist
 make rpm   # RPM package in dist
 ```
 
+### Releases
+
+The GitHub Actions release workflow runs when a `v*` version tag is pushed. It
+builds Linux and Windows assets on Linux, and macOS archives on native ARM64
+and Intel runners. The Linux release target also builds the DEB and RPM
+packages. Release files are staged in `dist/release/`.
+
+The Make targets can also be run locally:
+
+```bash
+make release-linux VERSION=0.5.5   # Linux, Windows, DEB and RPM assets
+make release-macos VERSION=0.5.5   # run on macOS; builds for the host architecture
+make release-checksums             # checksum files already staged in dist/release
+```
+
+`release-linux` requires the Linux/Fyne development dependencies above, plus
+`gcc-mingw-w64-x86-64`, `dpkg-dev`, `rpm`, `zip`, and the `go-winres` tool
+(`make install-winres`). To publish through GitHub Actions, push a version
+tag, for example `git push origin v0.5.5`.
+
 ## License
 
 BSD 3-Clause.

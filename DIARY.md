@@ -467,3 +467,21 @@
 - `staticcheck` could not run because the installed binary was built with Go
   1.24.2, older than the module's Go 1.27.3 requirement. `govulncheck` was not
   reached by `make audit` after that failure.
+
+## 2026-10-24 - GitHub releases
+
+### Changes
+
+- Added Make targets to build and stage Linux, Windows, Debian, RPM, and native
+  macOS release assets, plus SHA-256 checksums.
+- Added a tag-triggered GitHub Actions workflow. Build/package operations run
+  through Make targets; macOS assets are built natively for ARM64 and Intel.
+- Documented local release commands and the tag-push release process.
+
+### Verification
+
+- `actionlint .github/workflows/release.yml` passes.
+- `make -n release-linux VERSION=0.5.5`, `make -n release-checksums`, and a
+  prerelease archive dry run confirm Make target wiring and asset names without
+  producing release artifacts.
+- GitHub-hosted workflow jobs were not run locally.

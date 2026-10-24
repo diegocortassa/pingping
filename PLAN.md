@@ -134,6 +134,14 @@ above is complete for the initial version.
 - `internal/ping`: sequence tracking and timeout detection with a fake transport.
 - `internal/ui`: headless smoke test with the Fyne test driver.
 
+## 9. GitHub release automation
+
+- Build Linux archives, Debian/RPM packages, and a Windows archive through
+  reusable Makefile targets on Linux.
+- Build macOS archives natively for both supported runner architectures.
+- Trigger the workflow for version tags, collect the staged release assets,
+  generate checksums through Make, and publish them as a GitHub Release.
+
 ## 8. Approved maintenance follow-up
 
 - Use one cancellable app-level chart ticker and refresh only the selected live

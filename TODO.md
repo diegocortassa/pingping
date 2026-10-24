@@ -54,7 +54,8 @@
 
 ## Todo
 
-- [ ] Package release archives (zip/tar.gz) for Linux, Windows, macOS.
+- [x] Package release archives (zip/tar.gz) for Linux, Windows, and macOS with
+      tag-triggered GitHub Releases.
 - [x] Optional: export the collected samples to CSV/JSON for external analysis.
 - [ ] Optional: notification when a target goes down for longer than N probes.
 - [ ] Optional: reload the configuration file when it changes on disk.

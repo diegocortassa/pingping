@@ -1,16 +1,22 @@
 BINARY   := pingping
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.1.0)
 PKGVER   := $(shell echo $(VERSION) | sed 's/^v//; s/-.*//')
+RELEASE_VERSION := $(patsubst v%,%,$(VERSION))
 DIST     := dist
+RELEASE  := $(DIST)/release
 PKG      := github.com/diegocortassa/pingping
 LDFLAGS  := -s -w -X $(PKG)/internal/appinfo.Version=$(VERSION)
 WINFLAGS := $(LDFLAGS) -H=windowsgui
 GOFLAGS  := -trimpath
 GOBIN    := $(shell go env GOPATH)/bin
+GOOS     := $(shell go env GOOS)
+GOARCH   := $(shell go env GOARCH)
 WIN_CC   ?= x86_64-w64-mingw32-gcc
 WINRES   := rsrc_windows_amd64.syso
 
-.PHONY: all build build-windows windows-resource test audit run clean icons install-tools deb rpm
+.PHONY: all build build-windows windows-resource release-archive release-linux \
+	release-windows release-macos release-linux-packages release-checksums \
+	test audit run clean icons install-tools install-winres deb rpm
 
 all: build
 
@@ -40,6 +46,36 @@ build-windows: windows-resource
 	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=$(WIN_CC) \
 		go build $(GOFLAGS) -ldflags '$(WINFLAGS)' -o $(DIST)/$(BINARY).exe .
 	@echo "built $(DIST)/$(BINARY).exe $(VERSION)"
+
+## release-archive: package the native binary and README into a tar.gz archive
+release-archive: build
+	@mkdir -p $(RELEASE)
+	tar -czf $(RELEASE)/$(BINARY)_$(RELEASE_VERSION)_$(GOOS)_$(GOARCH).tar.gz \
+		-C $(DIST) $(BINARY) -C $(CURDIR) README.md
+
+## release-windows: build and package the Windows executable into a zip archive
+release-windows: build-windows
+	@mkdir -p $(RELEASE)
+	zip -j -q $(RELEASE)/$(BINARY)_$(RELEASE_VERSION)_windows_amd64.zip $(DIST)/$(BINARY).exe README.md
+
+## release-linux-packages: stage Debian and RPM packages in $(RELEASE)
+release-linux-packages: deb rpm
+	@mkdir -p $(RELEASE)
+	cp $(DIST)/$(BINARY)_$(PKGVER)_amd64.deb $(RELEASE)/
+	@find $(DIST)/rpm/RPMS -type f -name '*.rpm' -exec cp {} $(RELEASE)/ \;
+
+## release-linux: build Linux, Windows, DEB and RPM release assets
+release-linux: release-archive release-windows release-linux-packages
+
+## release-macos: package the native macOS binary into a tar.gz archive
+release-macos: release-archive
+
+## release-checksums: generate SHA-256 checksums for staged release files
+release-checksums:
+	@test -n "$(wildcard $(RELEASE)/*.tar.gz $(RELEASE)/*.zip $(RELEASE)/*.deb $(RELEASE)/*.rpm)" || \
+		(echo "no release files found in $(RELEASE)" && exit 1)
+	@cd $(RELEASE) && find . -maxdepth 1 -type f ! -name checksums.txt \
+		-exec sha256sum {} + > checksums.txt
 
 ## test: run the unit tests
 test:
@@ -71,9 +107,12 @@ icons:
 	@echo "regenerated assets/icons/icon.png and assets/icons/tray.png"
 
 ## install-tools: install the tools used by the audit target
-install-tools:
+install-tools: install-winres
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 	go install golang.org/x/vuln/cmd/govulncheck@latest
+
+## install-winres: install the Windows resource generator
+install-winres:
 	go install github.com/tc-hib/go-winres@latest
 
 ## deb: build a Debian package

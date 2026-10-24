@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install build and package dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            gcc-mingw-w64-x86-64 \
+            dpkg-dev \
+            libgl1-mesa-dev \
+            libglx-dev \
+            libwayland-dev \
+            libxkbcommon-dev \
+            rpm \
+            wayland-protocols \
+            xorg-dev \
+            zip
+
+      - name: Run tests
+        run: make test
+
+      - name: Install Windows resource tool
+        run: make install-winres
+
+      - name: Build Linux, Windows, DEB, and RPM assets
+        run: make release-linux VERSION="${GITHUB_REF_NAME#v}"
+
+      - name: Upload Linux release assets
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-linux
+          path: dist/release/*
+          if-no-files-found: error
+
+  build-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-latest
+            arch: arm64
+          - runner: macos-15-intel
+            arch: amd64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build macOS archive
+        run: make release-macos VERSION="${GITHUB_REF_NAME#v}"
+
+      - name: Upload macOS release asset
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-macos-${{ matrix.arch }}
+          path: dist/release/*
+          if-no-files-found: error
+
+  release:
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Download release assets
+        uses: actions/download-artifact@v8
+        with:
+          pattern: release-*
+          path: dist/release
+          merge-multiple: true
+
+      - name: Generate checksums
+        run: make release-checksums
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: PingPing ${{ github.ref_name }}
+          files: dist/release/*
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
