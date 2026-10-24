@@ -389,7 +389,3 @@ make release-checksums             # checksum files already staged in dist/relea
 `gcc-mingw-w64-x86-64`, `dpkg-dev`, `rpm`, `zip`, and the `go-winres` tool
 (`make install-winres`). To publish through GitHub Actions, push a version
 tag, for example `git push origin v0.5.5`.
-
-## License
-
-BSD 3-Clause.
