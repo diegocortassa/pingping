@@ -70,9 +70,10 @@ jobs:
 
       - name: Install RPM build dependencies
         run: |
-          dnf install -y bash 'dnf-command(config-manager)'
-          dnf config-manager --set-enabled crb
-          dnf install -y \
+          export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+          /usr/bin/dnf install -y bash 'dnf-command(config-manager)'
+          /usr/bin/dnf config-manager --set-enabled crb
+          /usr/bin/dnf install -y \
             desktop-file-utils \
             gcc \
             git \
@@ -90,7 +91,9 @@ jobs:
             which
 
       - name: Build and stage RPM
-        run: make release-rpm VERSION="${GITHUB_REF_NAME#v}"
+        run: |
+          export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+          make release-rpm VERSION="${GITHUB_REF_NAME#v}"
 
       - name: Upload RPM release asset
         uses: actions/upload-artifact@v7

@@ -476,6 +476,8 @@
   macOS release assets, plus SHA-256 checksums. RPM now has a separate target.
 - Added a tag-triggered GitHub Actions workflow. RPM builds in Rocky Linux 9;
   macOS assets are built natively for ARM64 and Intel.
+- The RPM job now prepends standard system paths and invokes `/usr/bin/dnf`
+  explicitly after CI reported `dnf: command not found`.
 - Documented local release commands and the tag-push release process.
 
 ### Verification
